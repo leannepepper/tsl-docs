@@ -1,10 +1,5 @@
-import { Directory } from 'renoun/file-system'
+import { Directory, JavaScriptFile } from "renoun/file-system";
 
-export const ComponentsCollection = new Directory({
-  path: 'components',
-  loader: {
-    ts: (path) => import(`./components/${path}.ts`),
-    tsx: (path) => import(`./components/${path}.tsx`),
-    mdx: (path) => import(`./components/${path}.mdx`),
-  },
-})
+export const TSLDirectory = new Directory({
+  path: "./three/src/nodes",
+});
