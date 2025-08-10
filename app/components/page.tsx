@@ -157,14 +157,6 @@ const components = {
       }}
     />
   ),
-  TableSubRow: (props) => (
-    <tr
-      {...props}
-      css={{
-        borderBottom: "1px solid var(--color-separator)",
-      }}
-    />
-  ),
 } satisfies Partial<ReferenceComponents>;
 
 export default async function Components() {
@@ -191,7 +183,7 @@ export default async function Components() {
             }}
           >
             {fileExport.getName()}
-            {/* <Reference source={fileExport} components={components} /> */}
+            <Reference source={fileExport} components={components} />
           </div>
         );
       })}
