@@ -1,5 +1,5 @@
 import { Reference } from "renoun";
-import { tslRootPath } from "@/app/api/lib/tsl-collections";
+import { tslRootPath } from "@/app/lib/tsl-collections";
 
 export default function Page() {
   return (

@@ -3,7 +3,7 @@ import {
   materialsDir,
   tslCategories,
   getDirForCategory,
-} from "@/app/api/lib/tsl-collections";
+} from "@/app/lib/tsl-collections";
 
 async function list(dir: any) {
   return dir.getEntries();

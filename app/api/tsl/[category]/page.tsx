@@ -4,7 +4,7 @@ import {
   tslCategories,
   getDirForCategory,
   constantsPath,
-} from "@/app/api/lib/tsl-collections";
+} from "@/app/lib/tsl-collections";
 
 export const dynamic = "error"; // ensure it's fully static
 

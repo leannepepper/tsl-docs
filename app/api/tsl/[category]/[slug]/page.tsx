@@ -1,8 +1,5 @@
 import { Reference } from "renoun";
-import {
-  tslCategories,
-  getDirForCategory,
-} from "@/app/api/lib/tsl-collections";
+import { tslCategories, getDirForCategory } from "@/app/lib/tsl-collections";
 
 export const dynamic = "error";
 

@@ -15,7 +15,7 @@
     "next": "15.4.5",
     "react": "19.1.1",
     "react-dom": "19.1.1",
-    "renoun": "10.1.1",
+    "renoun": "https://raw.githubusercontent.com/souporserious/renoun/package-preview/312/renoun-10.1.2-e189fc9.tgz",
     "restyle": "3.4.2",
     "tm-themes": "1.10.7",
     "ts-morph": "26.0.0"

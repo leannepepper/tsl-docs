@@ -8,7 +8,7 @@ const TSL_ROOT = "./three/src/nodes";
 
 // ---- NodeMaterials (separate top-level bucket)
 export const materialsDir = new Directory({
-  path: path.join(TSL_ROOT, "materials"),
+  path: path.join(TSL_ROOT, "materialx"),
   filter: "*.js",
   basePathname: "/api/node-materials",
   slugCasing: "kebab",
