@@ -3,6 +3,7 @@ import Link from "next/link";
 import { RootProvider } from "renoun";
 
 import "./layout.css";
+import Sidebar from "./components/Sidebar";
 
 export const metadata: Metadata = {
   title: "Design System",
@@ -22,11 +23,12 @@ export default function RootLayout({
     <RootProvider>
       <html lang="en" suppressHydrationWarning>
         <body>
-          <nav css={{ display: "flex", gap: "1rem" }}>
-            {/* <Link href="/">Home</Link>
-            <Link href="/components">Components</Link> */}
-          </nav>
-          {children}
+          <div className="docs-layout">
+            <aside className="docs-sidebar">
+              <Sidebar />
+            </aside>
+            <main className="docs-content">{children}</main>
+          </div>
         </body>
       </html>
     </RootProvider>
