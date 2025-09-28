@@ -36,7 +36,7 @@ a {
 .docs-layout {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: 260px 740px;
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -55,6 +55,21 @@ a {
 .docs-content {
   min-width: 0;
   padding: 2rem 0;
+}
+
+/* Prevent wide content from expanding layout */
+.docs-content pre,
+.docs-content code,
+.docs-content table,
+.docs-content img,
+.docs-content .code-block,
+.docs-content .reference-table {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.docs-content pre {
+  overflow: auto;
 }
 
 /* Sidebar styles */
