@@ -3,7 +3,7 @@ import { Reference } from "renoun";
 import {
   tslCategories,
   getDirForCategory,
-  constantsPath,
+  getConstantsFile,
 } from "@/app/lib/tsl-collections";
 
 export const dynamic = "error"; // ensure it's fully static
@@ -16,15 +16,16 @@ export async function generateStaticParams() {
 export default async function Page({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }) {
-  const category = params.category;
+  const { category } = await params;
 
   if (category === "constants") {
+    const file = await getConstantsFile();
     return (
       <>
         <h1>constants</h1>
-        <Reference source={constantsPath} />
+        <Reference source={file} />
       </>
     );
   }

@@ -1,27 +1,31 @@
 // tsl-collections.ts
 import path from "node:path";
-import { Directory } from "renoun";
+import { Directory, GitHostFileSystem } from "renoun";
 
-// If you have a local clone at ./three (as in your screenshot)
+// Source three.js directly from GitHub so we always stay up to date
+// Adjust ref to a specific tag like "r171" if you want to pin
+export const threeFs = new GitHostFileSystem({
+  host: "github",
+  repository: "mrdoob/three.js",
+  ref: "dev",
+});
 
-const TSL_ROOT = "./three/src/nodes";
+const TSL_ROOT = "src/nodes";
 
 // ---- NodeMaterials (separate top-level bucket)
 export const materialsDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "materialx"),
   filter: "*.js",
   basePathname: "/api/node-materials",
   slugCasing: "kebab",
-  // no loader needed
 });
 
 // ---- Exact hierarchy from your snippet
 
-// constants (single file)
-export const constantsPath = path.join(TSL_ROOT, "core", "constants.js");
-
 // core
 export const coreDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "core"),
   filter: "*.js",
   basePathname: "/api/tsl/core",
@@ -30,6 +34,7 @@ export const coreDir = new Directory({
 
 // utils
 export const utilsDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "utils"),
   filter: "*.js",
   basePathname: "/api/tsl/utils",
@@ -38,6 +43,7 @@ export const utilsDir = new Directory({
 
 // math
 export const mathDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "math"),
   filter: "*.js",
   basePathname: "/api/tsl/math",
@@ -46,6 +52,7 @@ export const mathDir = new Directory({
 
 // accessors
 export const accessorsDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "accessors"),
   filter: "*.js",
   basePathname: "/api/tsl/accessors",
@@ -54,6 +61,7 @@ export const accessorsDir = new Directory({
 
 // display
 export const displayDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "display"),
   filter: "*.js",
   basePathname: "/api/tsl/display",
@@ -62,6 +70,7 @@ export const displayDir = new Directory({
 
 // code
 export const codeDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "code"),
   filter: "*.js",
   basePathname: "/api/tsl/code",
@@ -70,6 +79,7 @@ export const codeDir = new Directory({
 
 // geometry
 export const geometryDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "geometry"),
   filter: "*.js",
   basePathname: "/api/tsl/geometry",
@@ -78,6 +88,7 @@ export const geometryDir = new Directory({
 
 // gpgpu
 export const gpgpuDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "gpgpu"),
   filter: "*.js",
   basePathname: "/api/tsl/gpgpu",
@@ -86,6 +97,7 @@ export const gpgpuDir = new Directory({
 
 // lighting
 export const lightingDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "lighting"),
   filter: "*.js",
   basePathname: "/api/tsl/lighting",
@@ -94,6 +106,7 @@ export const lightingDir = new Directory({
 
 // pmrem
 export const pmremDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "pmrem"),
   filter: "*.js",
   basePathname: "/api/tsl/pmrem",
@@ -102,6 +115,7 @@ export const pmremDir = new Directory({
 
 // parsers
 export const parsersDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "parsers"),
   filter: "*.js",
   basePathname: "/api/tsl/parsers",
@@ -110,14 +124,12 @@ export const parsersDir = new Directory({
 
 // lighting models
 export const lightingModelsDir = new Directory({
+  fileSystem: threeFs,
   path: path.join(TSL_ROOT, "functions"),
   filter: "*.LightingModel.js",
   basePathname: "/api/tsl/lighting-models",
   slugCasing: "kebab",
 });
-
-// TSL root exports page
-export const tslRootPath = path.join(TSL_ROOT, "TSL.js");
 
 export const tslCategories: {
   key: string;
@@ -147,4 +159,20 @@ export type TslCategoryKey = (typeof tslCategories)[number]["key"];
 
 export function getDirForCategory(key: TslCategoryKey) {
   return tslCategories.find((c) => c.key === key)?.dir || null;
+}
+
+// Helpers for pages that need single-file references
+export async function getConstantsFile() {
+  // constants.js lives under core
+  return await coreDir.getFile("constants", "js");
+}
+
+export async function getTslRootFile() {
+  // TSL.js at the root TSL directory
+  const dir = new Directory({
+    fileSystem: threeFs,
+    path: TSL_ROOT,
+    filter: "*.js",
+  });
+  return await dir.getFile("TSL", "js");
 }
