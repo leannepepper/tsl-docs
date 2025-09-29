@@ -16,9 +16,9 @@ export async function generateStaticParams() {
 export default async function Page({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }) {
-  const category = params.category;
+  const { category } = await params;
 
   if (category === "constants") {
     return (

@@ -27,7 +27,7 @@ export default function RootLayout({
             <aside className="docs-sidebar">
               <Sidebar />
             </aside>
-            <main className="docs-content">{children}</main>
+            {children}
           </div>
         </body>
       </html>

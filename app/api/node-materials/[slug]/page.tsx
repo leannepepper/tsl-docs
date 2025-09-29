@@ -12,11 +12,16 @@ export async function generateStaticParams() {
   });
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
   if (!materialsDir) {
     return <p>No NodeMaterials folder in this three build.</p>;
   }
-  const file = await materialsDir.getFile(params.slug, "js");
+  const file = await materialsDir.getFile(slug, "js");
   return (
     <>
       <h1>{file.getTitle()}</h1>

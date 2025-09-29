@@ -7,6 +7,7 @@ export default function Page() {
         This is the API documentation for the Three.js TSL library. It is a work
         in progress and is not yet complete.
       </p>
+      <Link href="/api/tsl">Go to Docs</Link>
     </main>
   );
 }

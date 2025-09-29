@@ -26,12 +26,13 @@ export async function generateStaticParams() {
 export default async function Page({
   params,
 }: {
-  params: { category: string; slug: string };
+  params: Promise<{ category: string; slug: string }>;
 }) {
-  const dir = getDirForCategory(params.category as any);
+  const { category, slug } = await params;
+  const dir = getDirForCategory(category as any);
   if (!dir) return <p>Unknown category.</p>;
 
-  const file = await dir.getFile(params.slug, "js");
+  const file = await dir.getFile(slug, "js");
   return (
     <>
       <h1>{file.getTitle()}</h1>

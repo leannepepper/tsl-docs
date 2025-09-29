@@ -2,8 +2,8 @@
 import path from "node:path";
 import { Directory } from "renoun";
 
-// If you have a local clone at ./three (as in your screenshot)
-
+// Path to the wiki page https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language#learning-tsl
+const TSL_WIKI_PATH = "./three/wiki/Three.js-Shading-Language";
 const TSL_ROOT = "./three/src/nodes";
 
 // ---- NodeMaterials (separate top-level bucket)
@@ -12,7 +12,6 @@ export const materialsDir = new Directory({
   filter: "*.js",
   basePathname: "/api/node-materials",
   slugCasing: "kebab",
-  // no loader needed
 });
 
 // ---- Exact hierarchy from your snippet
