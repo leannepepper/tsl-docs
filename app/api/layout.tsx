@@ -1,18 +1,13 @@
-"use client";
 import OnThisPage from "@/app/components/OnThisPage";
-import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { tslCategories } from "../lib/tsl-collections";
 
-export default function APILayout(props: any) {
-  const { children, params } = props;
-  const pathname = usePathname();
-  console.log({ pathname });
-  return (
-    <>
-      <main className="docs-content">{children}</main>
-      <aside className="docs-toc">
-        <OnThisPage />
-      </aside>
-    </>
-  );
+export async function generateStaticParams() {
+  // one page per category (including "constants")
+  return tslCategories.map((c) => ({ category: c.key }));
+}
+
+export default async function APILayout(props: any) {
+  const { children } = props;
+  return <> {children} </>;
 }

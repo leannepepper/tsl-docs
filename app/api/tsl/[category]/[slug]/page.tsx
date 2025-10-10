@@ -1,4 +1,5 @@
-import { Reference } from "renoun";
+import { MDXHeadings, Reference } from "renoun";
+import OnThisPage from "@/app/components/OnThisPage";
 import { tslCategories, getDirForCategory } from "@/app/lib/tsl-collections";
 
 export const dynamic = "error";
@@ -33,10 +34,22 @@ export default async function Page({
   if (!dir) return <p>Unknown category.</p>;
 
   const file = await dir.getFile(slug, "js");
+  const exports = await file.getExports();
+  const headings: MDXHeadings = exports.map((exp) => ({
+    id: exp.getSlug(),
+    text: exp.getTitle(),
+    level: 3,
+  }));
+
   return (
     <>
-      <h1>{file.getTitle()}</h1>
-      <Reference source={file.getAbsolutePath()} />
+      <main className="docs-content">
+        <h1>{file.getTitle()}</h1>
+        <Reference source={file.getAbsolutePath()} />
+      </main>
+      <aside className="docs-toc">
+        <OnThisPage headings={headings} />
+      </aside>
     </>
   );
 }
