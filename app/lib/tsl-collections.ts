@@ -19,6 +19,16 @@ export const materialsDir = new Directory({
 // constants (single file)
 export const constantsPath = path.join(TSL_ROOT, "core", "constants.js");
 
+// Base directory for all TSL files
+export const tslDir = new Directory({
+  path: TSL_ROOT,
+  // path: './src/nodes',
+  // baseDirectory: './three',
+  filter: "*.js",
+  basePathname: "/api/tsl",
+  slugCasing: "kebab",
+});
+
 // core
 export const coreDir = new Directory({
   path: path.join(TSL_ROOT, "core"),

@@ -1,5 +1,6 @@
-import { MDXHeadings, Reference } from "renoun";
-import OnThisPage from "@/app/components/OnThisPage";
+import { Reference } from "renoun";
+import React from "react";
+import { OnThisPage } from "@/app/components/OnThisPage";
 import { tslCategories, getDirForCategory } from "@/app/lib/tsl-collections";
 
 export const dynamic = "error";
@@ -35,20 +36,24 @@ export default async function Page({
 
   const file = await dir.getFile(slug, "js");
   const exports = await file.getExports();
-  const headings: MDXHeadings = exports.map((exp) => ({
+  const headings = exports.map((exp) => ({
     id: exp.getSlug(),
     text: exp.getTitle(),
     level: 3,
   }));
 
+  const Section = (props: React.HTMLAttributes<HTMLHeadingElement>) => {
+    // TODO: add id to the section
+    return <section {...props} style={{ scrollMarginTop: "80px" }} />;
+  };
   return (
     <>
       <main className="docs-content">
         <h1>{file.getTitle()}</h1>
-        <Reference source={file.getAbsolutePath()} />
+        <Reference source={file.getAbsolutePath()} components={{ Section }} />
       </main>
       <aside className="docs-toc">
-        <OnThisPage headings={headings} />
+        <OnThisPage headings={headings} entry={file} />
       </aside>
     </>
   );

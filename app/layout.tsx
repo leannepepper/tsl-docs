@@ -20,7 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RootProvider>
+    <RootProvider
+      git="mrdoob/three.js@dev"
+      theme={{ light: "everforest-light", dark: "dracula-soft" }}
+    >
       <html lang="en" suppressHydrationWarning>
         <body>
           <div className="docs-layout">
