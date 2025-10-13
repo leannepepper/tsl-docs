@@ -4,6 +4,9 @@
   --color-muted: #777;
   --color-border: #e5e5e5;
   --color-surface: #ffffff;
+  /* Home hero accents */
+  --hero-accent: #71c6ff; /* light cyan/blue for TSL letters */
+  --hero-kicker: #a7a7a7;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -289,4 +292,63 @@ a {
   margin-right: 0.5rem;
   border-radius: 999px;
   background-color: currentColor;
+}
+
+/* ---------------- Home hero ---------------- */
+.home-hero {
+  grid-column: 1 / -1;
+  display: grid;
+  place-items: center;
+  min-height: calc(100dvh - 4rem);
+  padding: 2rem 1rem;
+}
+
+.home-hero__content {
+  min-width: 25%;
+  margin: 0 auto;
+  grid-template-rows: 0fr 2fr 1fr;
+  display: grid;
+  align-items: center;
+}
+
+.home-hero__kicker {
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--hero-kicker);
+}
+
+.home-hero__words span {
+  color: var(--hero-accent);
+}
+
+.home-hero__words div {
+  font-size: clamp(2.5rem, 6vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: 0.2rem;
+  margin: 0.2rem 0;
+}
+
+.home-hero__cta {
+  margin-top: 2.5rem;
+  font-size: 1.125rem;
+  color: var(--hero-kicker);
+  text-decoration: none;
+  justify-self: end;
+}
+
+.home-hero__cta:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .home-hero {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  .home-hero__grid {
+    column-gap: 0.75rem;
+  }
+  .home-hero__cta {
+    margin-top: 2rem;
+  }
 }

@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { RootProvider } from "renoun";
-
 import "./layout.css";
-import Sidebar from "./components/Sidebar";
 
 export const metadata: Metadata = {
   title: "Design System",
@@ -25,14 +22,7 @@ export default function RootLayout({
       theme={{ light: "everforest-light", dark: "dracula-soft" }}
     >
       <html lang="en" suppressHydrationWarning>
-        <body>
-          <div className="docs-layout">
-            <aside className="docs-sidebar">
-              <Sidebar />
-            </aside>
-            {children}
-          </div>
-        </body>
+        <body>{children}</body>
       </html>
     </RootProvider>
   );

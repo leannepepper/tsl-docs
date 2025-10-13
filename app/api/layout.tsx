@@ -1,5 +1,4 @@
-import OnThisPage from "@/app/components/OnThisPage";
-import type { ReactNode } from "react";
+import Sidebar from "../components/Sidebar";
 import { tslCategories } from "../lib/tsl-collections";
 
 export async function generateStaticParams() {
@@ -9,5 +8,12 @@ export async function generateStaticParams() {
 
 export default async function APILayout(props: any) {
   const { children } = props;
-  return <> {children} </>;
+  return (
+    <div className="docs-layout">
+      <aside className="docs-sidebar">
+        <Sidebar />
+      </aside>
+      {children}
+    </div>
+  );
 }
