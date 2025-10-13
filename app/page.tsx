@@ -1,8 +1,10 @@
 import Link from "next/link";
+import HeroBackground from "./components/HeroBackground";
 
 export default function Page() {
   return (
     <main className="home-hero">
+      <HeroBackground />
       <div className="home-hero__content">
         <p className="home-hero__kicker">unofficial</p>
         <div

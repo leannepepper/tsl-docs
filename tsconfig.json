@@ -21,13 +21,21 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["*"],
+      "three-pkg": ["node_modules/three"],
+      "three-pkg/*": ["node_modules/three/*"]
     },
     "target": "ES2017"
   },
   "mdx": {
     "checkMdx": true
   },
-  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

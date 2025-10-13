@@ -17,6 +17,7 @@
     "react-dom": "19.1.1",
     "renoun": "10.4.0",
     "restyle": "^3.4.2",
+    "three": "^0.180.0",
     "tm-themes": "1.10.7",
     "ts-morph": "26.0.0"
   },
