@@ -33,7 +33,7 @@ export default async function Page({
     <>
       <main className="docs-content">
         <h1>{file.getTitle()}</h1>
-        <Reference source={file.getAbsolutePath()} />
+        <Reference source={file as any} />
       </main>
       <aside className="docs-toc">
         <OnThisPage headings={headings} entry={file} />

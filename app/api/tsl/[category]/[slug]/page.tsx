@@ -50,7 +50,7 @@ export default async function Page({
     <>
       <main className="docs-content">
         <h1>{file.getTitle()}</h1>
-        <Reference source={file.getAbsolutePath()} components={{ Section }} />
+        <Reference source={file as any} components={{ Section }} />
       </main>
       <aside className="docs-toc">
         <OnThisPage headings={headings} entry={file} />

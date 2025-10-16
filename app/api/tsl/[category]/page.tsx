@@ -4,6 +4,7 @@ import {
   tslCategories,
   getDirForCategory,
   constantsPath,
+  coreDir,
 } from "@/app/lib/tsl-collections";
 
 export const dynamic = "error"; // ensure it's fully static
@@ -21,10 +22,11 @@ export default async function Page({
   const { category } = await params;
 
   if (category === "constants") {
+    const constantsFile = await coreDir.getFile("constants", "js");
     return (
       <>
         <h1>constants</h1>
-        <Reference source={constantsPath} />
+        <Reference source={constantsFile as any} />
       </>
     );
   }

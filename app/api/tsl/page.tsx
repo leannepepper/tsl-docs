@@ -1,11 +1,12 @@
 import { Reference } from "renoun";
-import { tslRootPath } from "@/app/lib/tsl-collections";
+import { tslDir } from "@/app/lib/tsl-collections";
 
-export default function Page() {
+export default async function Page() {
+  const file = await tslDir.getFile("TSL", "js");
   return (
     <>
       <h1>TSL.js Exports</h1>
-      <Reference source={tslRootPath} />
+      <Reference source={file} />
     </>
   );
 }
