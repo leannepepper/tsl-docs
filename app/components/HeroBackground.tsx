@@ -29,7 +29,7 @@ export default function HeroBackground() {
       mix,
       uv,
       oscSine,
-      timerLocal,
+      time,
       vec2,
       abs,
       add,
@@ -37,7 +37,7 @@ export default function HeroBackground() {
       saturate,
       smoothstep,
     } = TSL as any;
-    const timeSignal = timerLocal();
+    const timeSignal = time;
     const topColor = color(0x2b4b85);
     const bottomColor = color(0x0e2448);
 

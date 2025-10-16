@@ -16,7 +16,7 @@ export default async function Page() {
     );
   }
 
-  const entries = await materialsDir.getEntries();
+  const entries = await materialsDir.getEntries().catch(() => [] as any[]);
   return (
     <>
       <h1>NodeMaterials</h1>
