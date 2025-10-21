@@ -19,7 +19,7 @@ const TSL_ROOT = "src/nodes";
 export const materialsDir = new Directory({
   path: path.join(TSL_ROOT, "materialx"),
   filter: "*.js",
-  basePathname: "/api/node-materials",
+  basePathname: "/docs/node-materials",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -35,7 +35,7 @@ export const tslDir = new Directory({
   // path: './src/nodes',
   // baseDirectory: './three',
   filter: "*.js",
-  basePathname: "/api/tsl",
+  basePathname: "/docs/tsl",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -44,7 +44,7 @@ export const tslDir = new Directory({
 export const coreDir = new Directory({
   path: path.join(TSL_ROOT, "core"),
   filter: "*.js",
-  basePathname: "/api/tsl/core",
+  basePathname: "/docs/tsl/core",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -53,7 +53,7 @@ export const coreDir = new Directory({
 export const utilsDir = new Directory({
   path: path.join(TSL_ROOT, "utils"),
   filter: "*.js",
-  basePathname: "/api/tsl/utils",
+  basePathname: "/docs/tsl/utils",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -62,7 +62,7 @@ export const utilsDir = new Directory({
 export const mathDir = new Directory({
   path: path.join(TSL_ROOT, "math"),
   filter: "*.js",
-  basePathname: "/api/tsl/math",
+  basePathname: "/docs/tsl/math",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -71,7 +71,7 @@ export const mathDir = new Directory({
 export const accessorsDir = new Directory({
   path: path.join(TSL_ROOT, "accessors"),
   filter: "*.js",
-  basePathname: "/api/tsl/accessors",
+  basePathname: "/docs/tsl/accessors",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -80,7 +80,7 @@ export const accessorsDir = new Directory({
 export const displayDir = new Directory({
   path: path.join(TSL_ROOT, "display"),
   filter: "*.js",
-  basePathname: "/api/tsl/display",
+  basePathname: "/docs/tsl/display",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -89,7 +89,7 @@ export const displayDir = new Directory({
 export const codeDir = new Directory({
   path: path.join(TSL_ROOT, "code"),
   filter: "*.js",
-  basePathname: "/api/tsl/code",
+  basePathname: "/docs/tsl/code",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -98,7 +98,7 @@ export const codeDir = new Directory({
 export const geometryDir = new Directory({
   path: path.join(TSL_ROOT, "geometry"),
   filter: "*.js",
-  basePathname: "/api/tsl/geometry",
+  basePathname: "/docs/tsl/geometry",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -107,7 +107,7 @@ export const geometryDir = new Directory({
 export const gpgpuDir = new Directory({
   path: path.join(TSL_ROOT, "gpgpu"),
   filter: "*.js",
-  basePathname: "/api/tsl/gpgpu",
+  basePathname: "/docs/tsl/gpgpu",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -116,7 +116,7 @@ export const gpgpuDir = new Directory({
 export const lightingDir = new Directory({
   path: path.join(TSL_ROOT, "lighting"),
   filter: "*.js",
-  basePathname: "/api/tsl/lighting",
+  basePathname: "/docs/tsl/lighting",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -125,7 +125,7 @@ export const lightingDir = new Directory({
 export const pmremDir = new Directory({
   path: path.join(TSL_ROOT, "pmrem"),
   filter: "*.js",
-  basePathname: "/api/tsl/pmrem",
+  basePathname: "/docs/tsl/pmrem",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -134,7 +134,7 @@ export const pmremDir = new Directory({
 export const parsersDir = new Directory({
   path: path.join(TSL_ROOT, "parsers"),
   filter: "*.js",
-  basePathname: "/api/tsl/parsers",
+  basePathname: "/docs/tsl/parsers",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });
@@ -143,7 +143,7 @@ export const parsersDir = new Directory({
 export const lightingModelsDir = new Directory({
   path: path.join(TSL_ROOT, "functions"),
   filter: "*.LightingModel.js",
-  basePathname: "/api/tsl/lighting-models",
+  basePathname: "/docs/tsl/lighting-models",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
 });

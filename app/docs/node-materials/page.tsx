@@ -16,12 +16,12 @@ export default async function Page() {
     );
   }
 
-  const entries = await materialsDir.getEntries().catch(() => [] as any[]);
+  const entries = await materialsDir.getEntries();
   return (
     <>
       <h1>NodeMaterials</h1>
       <ul>
-        {entries.map((e) => (
+        {entries?.map((e) => (
           <li key={e.getPathname()}>
             <Link href={e.getPathname()}>{e.getTitle()}</Link>
           </li>

@@ -3,7 +3,7 @@
   "name": "design-system",
   "scripts": {
     "dev": "renoun next --turbopack",
-    "build": "renoun next build",
+    "build": "next build",
     "start": "next start"
   },
   "dependencies": {

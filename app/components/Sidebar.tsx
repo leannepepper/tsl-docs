@@ -1,5 +1,4 @@
 import TreeNavigation, { NavItem } from "@/app/components/TreeNavigation";
-import Link from "next/link";
 import {
   materialsDir,
   tslCategories,
@@ -27,7 +26,7 @@ export default async function Sidebar() {
         {
           title: "TSL (nodes)",
           children: [
-            { title: "constants", href: "/api/tsl/constants" },
+            { title: "constants", href: "/docs/tsl/constants" },
             ...(await Promise.all(
               tslCategories
                 .filter((c) => c.key !== "constants")
@@ -36,7 +35,7 @@ export default async function Sidebar() {
                   const entries = dir ? await list(dir) : [];
                   return {
                     title: c.label,
-                    href: `/api/tsl/${c.key}`,
+                    href: `/docs/tsl/${c.key}`,
                     children: entries.map((e: any) => ({
                       title: e.getTitle(),
                       href: e.getPathname(),
@@ -46,7 +45,7 @@ export default async function Sidebar() {
             )),
           ],
         },
-        { title: "TSL.js Exports", href: "/api/tsl" },
+        { title: "TSL.js Exports", href: "/docs/tsl" },
       ],
     },
   ];
