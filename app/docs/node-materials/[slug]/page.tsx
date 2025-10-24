@@ -2,7 +2,9 @@ import { Headings, Reference } from "renoun";
 import { OnThisPage } from "@/app/components/OnThisPage";
 import { materialsDir } from "@/app/lib/tsl-collections";
 
-export const dynamic = "error";
+export const dynamic = "error"; // disallow runtime rendering
+export const revalidate = false; // not ISR
+export const dynamicParams = false; // only the params you return below
 
 export async function generateStaticParams() {
   if (!materialsDir) return [];

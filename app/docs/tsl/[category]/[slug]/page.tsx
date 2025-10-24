@@ -1,9 +1,15 @@
 import { Reference } from "renoun";
 import React from "react";
 import { OnThisPage } from "@/app/components/OnThisPage";
-import { tslCategories, getDirForCategory } from "@/app/lib/tsl-collections";
+import {
+  tslCategories,
+  getDirForCategory,
+  isExcludedTslEntry,
+} from "@/app/lib/tsl-collections";
 
-export const dynamic = "error";
+export const dynamic = "error"; // disallow runtime rendering
+export const revalidate = false; // not ISR
+export const dynamicParams = false; // only the params you return below
 
 export async function generateStaticParams() {
   const all: { category: string; slug: string }[] = [];
@@ -18,6 +24,7 @@ export async function generateStaticParams() {
       // the last segment of getPathname() is the slug (already kebab-cased)
       const parts = e.getPathname().split("/");
       const slug = parts[parts.length - 1];
+      if (isExcludedTslEntry(c.key, slug)) continue;
       all.push({ category: c.key, slug });
     }
   }
@@ -31,6 +38,9 @@ export default async function Page({
   params: Promise<{ category: string; slug: string }>;
 }) {
   const { category, slug } = await params;
+  if (isExcludedTslEntry(category, slug)) {
+    return <p>Page unavailable.</p>;
+  }
   const dir = getDirForCategory(category as any);
   if (!dir) return <p>Unknown category.</p>;
 

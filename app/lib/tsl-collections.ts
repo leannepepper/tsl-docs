@@ -180,3 +180,15 @@ export type TslCategoryKey = (typeof tslCategories)[number]["key"];
 export function getDirForCategory(key: TslCategoryKey) {
   return tslCategories.find((c) => c.key === key)?.dir || null;
 }
+
+const EXCLUDED_TSL_SLUGS: Partial<Record<TslCategoryKey, readonly string[]>> = {
+  math: ["math-node"],
+};
+
+export function isExcludedTslEntry(
+  category: string,
+  slug: string,
+): boolean {
+  const excluded = EXCLUDED_TSL_SLUGS[category as TslCategoryKey];
+  return excluded ? excluded.includes(slug) : false;
+}
