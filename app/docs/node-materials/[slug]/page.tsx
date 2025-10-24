@@ -27,7 +27,7 @@ export default async function Page({
   const file = await materialsDir.getFile(slug, "js");
   const exports = await file.getExports();
   const headings: Headings = exports.map((exp) => ({
-    id: exp.getSlug(),
+    id: exp.getName(),
     text: exp.getTitle(),
     level: 3,
   }));

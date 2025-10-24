@@ -47,7 +47,7 @@ export default async function Page({
   const file = await dir.getFile(slug, "js");
   const exports = await file.getExports();
   const headings = exports?.map((exp) => ({
-    id: exp.getSlug(),
+    id: exp.getName(),
     text: exp.getTitle(),
     level: 3,
   }));
