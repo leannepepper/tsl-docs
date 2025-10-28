@@ -1,5 +1,7 @@
+import type { HTMLAttributes } from "react";
 import Link from "next/link";
-import { Reference } from "renoun";
+import { Headings, Reference } from "renoun";
+import { OnThisPage } from "@/app/components/OnThisPage";
 import {
   tslCategories,
   getDirForCategory,
@@ -25,10 +27,26 @@ export default async function Page({
 
   if (category === "constants") {
     const constantsFile = await coreDir.getFile("constants", "js");
+    const exports = await constantsFile.getExports();
+    const headings: Headings = (exports ?? []).map((exp) => ({
+      id: exp.getName(),
+      text: exp.getTitle(),
+      level: 3,
+    }));
+
+    const Section = (props: HTMLAttributes<HTMLElement>) => (
+      <section {...props} style={{ scrollMarginTop: "80px" }} />
+    );
+
     return (
       <>
-        <h1>constants</h1>
-        <Reference source={constantsFile as any} />
+        <main className="docs-content">
+          <h1>constants</h1>
+          <Reference source={constantsFile as any} components={{ Section }} />
+        </main>
+        <aside className="docs-toc">
+          <OnThisPage headings={headings} entry={constantsFile} />
+        </aside>
       </>
     );
   }

@@ -16,6 +16,7 @@ export default async function Sidebar() {
     {
       title: "API",
       children: [
+        { title: "TSL.js Exports", href: "/docs/tsl" },
         {
           title: "NodeMaterials",
           children: materials.map((e: any) => ({
@@ -45,7 +46,6 @@ export default async function Sidebar() {
             )),
           ],
         },
-        { title: "TSL.js Exports", href: "/docs/tsl" },
       ],
     },
   ];
