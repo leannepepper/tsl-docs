@@ -38,7 +38,8 @@ a {
 .docs-layout {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 260px 640px 1fr;
+  /* grid-template-columns: 640px 200px 1fr; */
+  grid-template-columns: 1fr;
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;

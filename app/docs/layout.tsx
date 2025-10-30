@@ -1,4 +1,4 @@
-import Sidebar from "../components/Sidebar";
+import NodeGraph from "../components/NodeGraph";
 import { tslCategories } from "../lib/tsl-collections";
 
 export async function generateStaticParams() {
@@ -11,9 +11,9 @@ export default async function APILayout(props: any) {
   return (
     <div className="docs-layout">
       <aside className="docs-sidebar">
-        <Sidebar />
+        <NodeGraph />
       </aside>
-      {children}
+      {/* {children} */}
     </div>
   );
 }

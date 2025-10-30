@@ -34,7 +34,7 @@ export const tslDir = new Directory({
   path: TSL_ROOT,
   // path: './src/nodes',
   // baseDirectory: './three',
-  filter: "*.js",
+  filter: "**/*.js",
   basePathname: "/docs/tsl",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
@@ -185,10 +185,7 @@ const EXCLUDED_TSL_SLUGS: Partial<Record<TslCategoryKey, readonly string[]>> = {
   math: ["math-node"],
 };
 
-export function isExcludedTslEntry(
-  category: string,
-  slug: string,
-): boolean {
+export function isExcludedTslEntry(category: string, slug: string): boolean {
   const excluded = EXCLUDED_TSL_SLUGS[category as TslCategoryKey];
   return excluded ? excluded.includes(slug) : false;
 }
