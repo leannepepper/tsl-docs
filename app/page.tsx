@@ -25,7 +25,7 @@ export default function Page() {
           </div>
           <div>Docs</div>
         </div>
-        <Link href="/docs/tsl" className="home-hero__cta">
+        <Link href="/docs" className="home-hero__cta">
           Go to Docs
         </Link>
       </div>

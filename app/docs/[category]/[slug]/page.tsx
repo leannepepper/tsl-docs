@@ -1,11 +1,8 @@
-import { Reference } from "renoun";
+import { Headings, Reference } from "renoun";
 import React from "react";
 import { OnThisPage } from "@/app/components/OnThisPage";
-import {
-  tslCategories,
-  getDirForCategory,
-  isExcludedTslEntry,
-} from "@/app/lib/tsl-collections";
+import { tslCategories } from "@/app/lib/tsl-collections";
+import { isFile } from "renoun";
 
 export const dynamic = "error"; // disallow runtime rendering
 export const revalidate = false; // not ISR
@@ -13,22 +10,14 @@ export const dynamicParams = false; // only the params you return below
 
 export async function generateStaticParams() {
   const all: { category: string; slug: string }[] = [];
-
   for (const c of tslCategories) {
-    // only categories that have files (skip "constants")
-    const dir = "dir" in c && c.dir ? c.dir : null;
-    if (!dir) continue;
-
-    const entries = await dir.getEntries();
+    if (!c.dir) continue;
+    const entries = await c.dir.getEntries();
     for (const e of entries) {
-      // the last segment of getPathname() is the slug (already kebab-cased)
-      const parts = e.getPathname().split("/");
-      const slug = parts[parts.length - 1];
-      if (isExcludedTslEntry(c.key, slug)) continue;
-      all.push({ category: c.key, slug });
+      if (!isFile(e)) continue;
+      all.push({ category: c.key, slug: e.getSlug() });
     }
   }
-
   return all;
 }
 
@@ -38,24 +27,23 @@ export default async function Page({
   params: Promise<{ category: string; slug: string }>;
 }) {
   const { category, slug } = await params;
-  if (isExcludedTslEntry(category, slug)) {
-    return <p>Page unavailable.</p>;
+  const categoryEntry = tslCategories.find((c) => c.key === category);
+  if (!categoryEntry?.dir || slug === "math-node") {
+    return (
+      <p>
+        Unknown category or math node (which has a type reslove error right now)
+      </p>
+    );
   }
-  const dir = getDirForCategory(category as any);
-  if (!dir) return <p>Unknown category.</p>;
 
+  const dir = categoryEntry.dir;
   const file = await dir.getFile(slug, "js");
   const exports = await file.getExports();
-  const headings = (exports ?? []).map((exp) => ({
+  const headings: Headings = (exports ?? []).map((exp: any) => ({
     id: exp.getName(),
     text: exp.getTitle(),
     level: 3,
   }));
-
-  const Section = (props: React.HTMLAttributes<HTMLHeadingElement>) => {
-    // TODO: add id to the section
-    return <section {...props} style={{ scrollMarginTop: "80px" }} />;
-  };
   return (
     <>
       <main className="docs-content">
@@ -68,3 +56,7 @@ export default async function Page({
     </>
   );
 }
+
+const Section = (props: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <section {...props} style={{ scrollMarginTop: "80px" }} />
+);

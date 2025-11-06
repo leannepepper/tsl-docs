@@ -1,54 +1,52 @@
 import TreeNavigation, { NavItem } from "@/app/components/TreeNavigation";
-import {
-  materialsDir,
-  tslCategories,
-  getDirForCategory,
-} from "@/app/lib/tsl-collections";
+import { tslCategories } from "@/app/lib/tsl-collections";
+import { isDirectory, type Directory, type FileSystemEntry } from "renoun";
 
-async function list(dir: any) {
-  return dir.getEntries();
+function getHref(entry: FileSystemEntry) {
+  const relative = entry.getPathname({ includeBasePathname: false });
+  const normalized = relative.startsWith("/") ? relative : `/${relative}`;
+  return `/docs${normalized}`;
+}
+
+async function getChildren(directory: Directory<any>): Promise<NavItem[]> {
+  const entries = await directory.getEntries();
+  const children = await Promise.all(
+    entries.map(async (entry: FileSystemEntry) => {
+      if (isDirectory(entry)) {
+        const nestedChildren = await getChildren(entry);
+
+        return {
+          title: entry.getTitle(),
+          href: getHref(entry),
+          children: nestedChildren.length > 0 ? nestedChildren : undefined,
+        };
+      }
+
+      return {
+        title: entry.getTitle(),
+        href: getHref(entry),
+      };
+    })
+  );
+
+  return children;
 }
 
 export default async function Sidebar() {
-  const materials = await materialsDir.getEntries();
+  const items: NavItem[] = await Promise.all(
+    tslCategories.map(async (category) => {
+      const entry = category.dir as FileSystemEntry;
+      const children = isDirectory(entry)
+        ? await getChildren(entry)
+        : undefined;
 
-  const items: NavItem[] = [
-    {
-      title: "API",
-      children: [
-        { title: "TSL.js Exports", href: "/docs/tsl" },
-        {
-          title: "NodeMaterials",
-          children: materials.map((e: any) => ({
-            title: e.getTitle(),
-            href: e.getPathname(),
-          })),
-        },
-        {
-          title: "TSL (nodes)",
-          children: [
-            { title: "constants", href: "/docs/tsl/constants" },
-            ...(await Promise.all(
-              tslCategories
-                .filter((c) => c.key !== "constants")
-                .map(async (c) => {
-                  const dir = getDirForCategory(c.key as any);
-                  const entries = dir ? await list(dir) : [];
-                  return {
-                    title: c.label,
-                    href: `/docs/tsl/${c.key}`,
-                    children: entries.map((e: any) => ({
-                      title: e.getTitle(),
-                      href: e.getPathname(),
-                    })),
-                  } as NavItem;
-                })
-            )),
-          ],
-        },
-      ],
-    },
-  ];
+      return {
+        title: category.label,
+        href: getHref(entry),
+        children,
+      };
+    })
+  );
 
   return <TreeNavigation items={items} />;
 }
