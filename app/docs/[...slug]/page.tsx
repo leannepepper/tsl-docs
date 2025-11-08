@@ -60,19 +60,9 @@ export default async function Page({
     return notFound();
   }
 
-  if (segments.at(-1) === "math-node") {
-    return (
-      <p>
-        Unknown doc or math node (which has a type resolve error right now)
-      </p>
-    );
-  }
-
   const pathname = segments.join("/");
 
-  const file = await tslDir
-    .getFile(pathname, "js")
-    .catch(() => undefined);
+  const file = await tslDir.getFile(pathname, "js").catch(() => undefined);
 
   if (!file) {
     return notFound();

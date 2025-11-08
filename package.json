@@ -15,7 +15,7 @@
     "next": "15.4.5",
     "react": "19.1.1",
     "react-dom": "19.1.1",
-    "renoun": "10.9.0",
+    "renoun": "10.9.1",
     "restyle": "^3.4.2",
     "three": "^0.180.0",
     "tm-themes": "1.10.7",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "24.1.0",
+    "@types/three": "^0.181.0",
     "typescript": "^5.8.3"
   }
 }
