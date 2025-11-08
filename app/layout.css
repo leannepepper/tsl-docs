@@ -1,5 +1,5 @@
 :root {
-  --color-background: #050506;
+  --color-background: #222;
   --color-surface: #101114;
   --color-panel: #16171c;
   --color-panel-soft: #1d1e24;
@@ -10,7 +10,7 @@
   --color-accent: #08a8ff;
   --color-accent-soft: #39c5ff;
   --sidebar-width: 260px;
-  --toc-width: 220px;
+  --toc-width: 260px;
   --hero-accent: #4dd2ff;
   --hero-kicker: #9ca0ae;
 }
@@ -44,13 +44,12 @@ img {
 /* ------------------- Docs chrome ------------------- */
 .docs-layout {
   margin: 0;
-  background: var(--color-surface);
+  background-color: var(--color-background);
   border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .docs-header {
@@ -95,24 +94,20 @@ img {
 .docs-shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--toc-width);
-  background: var(--color-panel);
+  background-color: var(--color-background);
   min-height: 65vh;
 }
 
 .docs-sidebar {
   border-right: 1px solid var(--color-border);
   padding: 2.75rem 2rem;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.03),
-    rgba(0, 0, 0, 0.4)
-  );
+  background-color: var(--color-background);
 }
 
 .docs-content {
   padding: 2.75rem 3rem 3rem;
-  border-right: 1px solid var(--color-border);
   min-height: 100%;
+  background-color: var(--color-background);
 }
 
 .docs-content h1 {
@@ -157,8 +152,7 @@ img {
   position: sticky;
   top: 0;
   align-self: start;
-  min-height: 100%;
-  background: var(--color-panel-soft);
+  background-color: var(--color-background);
 }
 
 .docs-toc .title {
