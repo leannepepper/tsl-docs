@@ -18,12 +18,13 @@ export function ViewSource({
         display: "flex",
         alignItems: "center",
         gap: "0.5rem",
-        fontSize: "var(--font-size-body-3)",
-        color: "var(--color-foreground-interactive)",
-        stroke: "var(--color-foreground-interactive)",
+        fontSize: "0.9rem",
+        letterSpacing: "0.08em",
+        color: "var(--color-muted)",
+        stroke: "var(--color-muted)",
         ":hover": {
-          color: "var(--color-foreground-interactive-highlighted)",
-          stroke: "var(--color-foreground-interactive-highlighted)",
+          color: "var(--color-foreground)",
+          stroke: "var(--color-foreground)",
         },
         ...css,
       }}

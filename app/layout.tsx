@@ -1,6 +1,19 @@
 import type { Metadata } from "next";
+import { Iceberg, Space_Grotesk } from "next/font/google";
 import { RootProvider } from "renoun";
 import "./layout.css";
+
+const iceberg = Iceberg({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: "400",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-body",
+});
 
 export const metadata: Metadata = {
   title: "Design System",
@@ -22,7 +35,9 @@ export default function RootLayout({
       theme={{ light: "everforest-light", dark: "dracula-soft" }}
     >
       <html lang="en" suppressHydrationWarning>
-        <body>{children}</body>
+        <body className={`${spaceGrotesk.variable} ${iceberg.variable}`}>
+          {children}
+        </body>
       </html>
     </RootProvider>
   );

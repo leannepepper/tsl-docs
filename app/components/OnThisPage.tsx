@@ -53,19 +53,19 @@ export function OnThisPage({ headings, entry }: SiteTableOfContentsProps) {
           {...props}
           css={{
             display: "block",
-            fontSize: "var(--font-size-body-3)",
+            fontSize: "0.9rem",
             padding: "0.25rem 0",
             paddingLeft: "calc(var(--depth) * 0.8rem)",
-            scrollMarginBlock: "var(--font-size-body-3)",
+            scrollMarginBlock: "0.9rem",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
             overflow: "hidden",
-            color: "var(--color-foreground-interactive)",
+            color: "var(--color-muted)",
             ":hover": {
-              color: "var(--color-foreground-interactive-highlighted)",
+              color: "var(--color-foreground)",
             },
             "&[aria-current]": {
-              color: "white",
+              color: "var(--color-accent)",
             },
           }}
         />
@@ -80,7 +80,7 @@ export function OnThisPage({ headings, entry }: SiteTableOfContentsProps) {
           source={entry}
           css={{
             padding: "1rem 0",
-            borderTop: "1px solid var(--color-separator)",
+            borderTop: "1px solid var(--color-border)",
           }}
         />
       ) : null}
