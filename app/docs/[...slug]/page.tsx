@@ -9,6 +9,7 @@ import {
 import { notFound } from "next/navigation";
 
 import { OnThisPage } from "@/app/components/OnThisPage";
+import { DocsHeaderTitle } from "@/app/components/DocsHeader";
 import { tslDir } from "@/app/lib/tsl-collections";
 
 export const dynamic = "error"; // disallow runtime rendering
@@ -77,8 +78,8 @@ export default async function Page({
 
   return (
     <>
+      <DocsHeaderTitle title={file.getTitle()} />
       <main className="docs-content">
-        <h1>{file.getTitle()}</h1>
         <Reference source={file as any} components={{ Section }} />
       </main>
       <aside className="docs-toc">

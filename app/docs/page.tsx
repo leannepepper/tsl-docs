@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from "react";
 import { Headings, Reference } from "renoun";
 import { OnThisPage } from "@/app/components/OnThisPage";
+import { DocsHeaderTitle } from "@/app/components/DocsHeader";
 import { tslDir } from "@/app/lib/tsl-collections";
 
 export default async function Page() {
@@ -18,13 +19,15 @@ export default async function Page() {
 
   return (
     <>
+      <DocsHeaderTitle title="Search" />
       <main className="docs-content">
-        <h1>TSL.js Exports</h1>
-        <Reference source={file as any} components={{ Section }} />
+        This is the home page.
+        {/* <h1>TSL.js Exports</h1>
+        <Reference source={file as any} components={{ Section }} /> */}
       </main>
-      <aside className="docs-toc">
+      {/* <aside className="docs-toc">
         <OnThisPage headings={headings} entry={file} />
-      </aside>
+      </aside> */}
     </>
   );
 }
