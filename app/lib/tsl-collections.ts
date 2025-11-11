@@ -13,7 +13,7 @@ const TSL_WIKI_PATH = "wiki/Three.js-Shading-Language";
 // Use Renoun's GitHostFileSystem to read files directly from the three.js repo
 const threeRepoFs = new GitHostFileSystem({
   repository: "mrdoob/three.js",
-  ref: "dev",
+  ref: "master",
   host: "github",
   include: ["src/nodes"],
 });
