@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -26,6 +28,14 @@ export function DocsHeaderProvider({ children }: { children: ReactNode }) {
   const [title, setTitle] = useState("Search");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchActive, setSearchActive] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const isDocsHome = pathname === "/docs" || pathname === "/docs/";
+    setSearchQuery("");
+    setSearchActive(isDocsHome);
+  }, [pathname]);
+
   const value = useMemo(
     () => ({
       title,
@@ -160,9 +170,11 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
         {results.length ? (
           <ul className="docs-search__results">
             {results.map((result) => (
-              <li key={result.title} className="docs-search__result">
-                <div className="docs-search__result-title">{result.title}</div>
-                <p>{result.description}</p>
+              <li key={result.href}>
+                <Link href={result.href} className="docs-search__result">
+                  <div className="docs-search__result-title">{result.title}</div>
+                  <p>{result.description}</p>
+                </Link>
               </li>
             ))}
           </ul>
@@ -179,26 +191,36 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
   );
 }
 
-const MOCK_RESULTS = [
+type SearchResult = {
+  title: string;
+  description: string;
+  href: string;
+};
+
+const MOCK_RESULTS: SearchResult[] = [
   {
-    title: "Nodes · MathNode",
+    title: "Math · Math Node",
     description: "Compose math operations that run directly in your shader.",
+    href: "/docs/math/math-node",
   },
   {
-    title: "Materials · Phong",
-    description: "Classic phong lighting setup with configurable specular.",
+    title: "Core · Array Node",
+    description: "Build reusable inputs and structs for complex graphs.",
+    href: "/docs/core/array-node",
   },
   {
-    title: "Code · UV Index",
-    description: "Helper utilities for sampling UV coordinates across meshes.",
+    title: "Code · Scriptable Node",
+    description: "Author custom snippets that inject GLSL at compile time.",
+    href: "/docs/code/scriptable-node",
   },
   {
-    title: "Nodes · NoiseNode",
-    description: "Procedural noise primitives for organic surface details.",
+    title: "Display · Tone Mapping Node",
+    description: "Apply ACES-style tonemapping before presenting frames.",
+    href: "/docs/display/tone-mapping-node",
   },
 ];
 
-function filterSearchResults(query: string) {
+function filterSearchResults(query: string): SearchResult[] {
   const normalized = query.toLowerCase();
   return MOCK_RESULTS.filter(
     (item) =>

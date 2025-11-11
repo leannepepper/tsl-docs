@@ -5,6 +5,7 @@ import {
   isDirectory,
   isFile,
   type Directory,
+  type ReferenceComponents,
 } from "renoun";
 import { notFound } from "next/navigation";
 
@@ -80,7 +81,7 @@ export default async function Page({
     <>
       <DocsHeaderTitle title={file.getTitle()} />
       <main className="docs-content">
-        <Reference source={file as any} components={{ Section }} />
+        <Reference source={file as any} components={referenceComponents} />
       </main>
       <aside className="docs-toc">
         <OnThisPage headings={headings} entry={file} />
@@ -89,6 +90,105 @@ export default async function Page({
   );
 }
 
-const Section = (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-  <section {...props} style={{ scrollMarginTop: "80px" }} />
-);
+const referenceComponents: Partial<ReferenceComponents> = {
+  Section: ({ id, kind, children }) => (
+    <section
+      id={id}
+      data-kind={kind}
+      className="reference-section"
+      style={{ scrollMarginTop: "80px" }}
+    >
+      {children}
+    </section>
+  ),
+  SectionHeading: ({ label, title, ["aria-label"]: ariaLabel }) => (
+    <div className="reference-heading">
+      {label ? (
+        <span className="reference-heading__label">{label.toUpperCase()}</span>
+      ) : null}
+      {title ? (
+        <h2 className="reference-heading__title" aria-label={ariaLabel}>
+          {title}
+        </h2>
+      ) : null}
+    </div>
+  ),
+  SectionBody: ({ hasDescription, children }) => (
+    <div
+      className={cx(
+        "reference-body",
+        hasDescription ? "reference-body--with-description" : undefined
+      )}
+    >
+      {children}
+    </div>
+  ),
+  Column: ({ gap, children }) => (
+    <div className="reference-stack" data-gap={gap ?? undefined}>
+      {children}
+    </div>
+  ),
+  Row: ({ gap, children }) => (
+    <div className="reference-row" data-gap={gap ?? undefined}>
+      {children}
+    </div>
+  ),
+  Description: ({ children }) => (
+    <p className="reference-description">{children}</p>
+  ),
+  Detail: ({ children }) => (
+    <div className="reference-detail">{children}</div>
+  ),
+  DetailHeading: ({ children }) => (
+    <p className="reference-detail__heading">{children}</p>
+  ),
+  Signatures: ({ children }) => (
+    <div className="reference-signatures">{children}</div>
+  ),
+  Code: ({ children }) => <code className="reference-code">{children}</code>,
+  Table: ({ children }) => (
+    <table className="reference-table">{children}</table>
+  ),
+  TableHead: ({ children }) => (
+    <thead className="reference-table__head">{children}</thead>
+  ),
+  TableBody: ({ children }) => (
+    <tbody className="reference-table__body">{children}</tbody>
+  ),
+  TableRow: ({ hasSubRow, children }) => (
+    <tr
+      className={cx(
+        "reference-table__row",
+        hasSubRow ? "reference-table__row--has-sub" : undefined
+      )}
+    >
+      {children}
+    </tr>
+  ),
+  TableRowGroup: ({ children }) => <>{children}</>,
+  TableSubRow: ({ children }) => (
+    <tr className="reference-table__sub-row">
+      <td className="reference-table__sub-cell" colSpan={99}>
+        {children}
+      </td>
+    </tr>
+  ),
+  TableHeader: ({ children }) => (
+    <th className="reference-table__header">{children}</th>
+  ),
+  TableData: ({ children, colSpan, index }) => (
+    <td
+      className={cx(
+        "reference-table__cell",
+        typeof index === "number" ? `reference-table__cell--${index}` : undefined
+      )}
+      colSpan={colSpan}
+    >
+      {children}
+    </td>
+  ),
+};
+
+function cx(...classes: Array<string | undefined | false>) {
+  return classes.filter(Boolean).join(" ");
+}
