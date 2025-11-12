@@ -12,6 +12,10 @@ import { notFound } from "next/navigation";
 import { OnThisPage } from "@/app/components/OnThisPage";
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
 import { tslDir } from "@/app/lib/tsl-collections";
+import {
+  RECENT_BADGE_LABEL,
+  getRecentExportNamesForRoute,
+} from "@/app/lib/recent-exports";
 
 export const dynamic = "error"; // disallow runtime rendering
 export const revalidate = false; // not ISR
@@ -70,6 +74,9 @@ export default async function Page({
     return notFound();
   }
 
+  const docsRoute = `/docs/${pathname}`;
+  const recentExports = await getRecentExportNamesForRoute(docsRoute);
+  const referenceComponents = createReferenceComponents(recentExports);
   const exports = await file.getExports();
   const headings: Headings = (exports ?? []).map((exp: any) => ({
     id: exp.getName(),
@@ -90,7 +97,9 @@ export default async function Page({
   );
 }
 
-const referenceComponents: Partial<ReferenceComponents> = {
+const createReferenceComponents = (
+  recentExports: Set<string>
+): Partial<ReferenceComponents> => ({
   Section: ({ id, kind, children }) => (
     <section
       id={id}
@@ -101,18 +110,28 @@ const referenceComponents: Partial<ReferenceComponents> = {
       {children}
     </section>
   ),
-  SectionHeading: ({ label, title, ["aria-label"]: ariaLabel }) => (
-    <div className="reference-heading">
-      {label ? (
-        <span className="reference-heading__label">{label.toUpperCase()}</span>
-      ) : null}
-      {title ? (
-        <h2 className="reference-heading__title" aria-label={ariaLabel}>
-          {title}
-        </h2>
-      ) : null}
-    </div>
-  ),
+  SectionHeading: ({ label, title, ["aria-label"]: ariaLabel }) => {
+    const showRecentBadge = !!title && recentExports.has(title);
+    return (
+      <div className="reference-heading">
+        <div className="reference-heading__meta">
+          {label ? (
+            <span className="reference-heading__label">
+              {label.toUpperCase()}
+            </span>
+          ) : null}
+          {showRecentBadge ? (
+            <span className="badge badge--recent">{RECENT_BADGE_LABEL}</span>
+          ) : null}
+        </div>
+        {title ? (
+          <h2 className="reference-heading__title" aria-label={ariaLabel}>
+            {title}
+          </h2>
+        ) : null}
+      </div>
+    );
+  },
   SectionBody: ({ hasDescription, children }) => (
     <div
       className={cx(
@@ -187,7 +206,7 @@ const referenceComponents: Partial<ReferenceComponents> = {
       {children}
     </td>
   ),
-};
+});
 
 function cx(...classes: Array<string | undefined | false>) {
   return classes.filter(Boolean).join(" ");
