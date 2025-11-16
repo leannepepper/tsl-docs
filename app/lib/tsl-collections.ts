@@ -16,7 +16,7 @@ const threeRepoFs = new GitHostFileSystem({
   ref: "master",
   host: "github",
   include: ["src/nodes"],
-  token: process.env.GITHUB_TOKEN,
+  token: process.env.FS_TOKEN,
 });
 
 const TSL_ROOT = "src/nodes";

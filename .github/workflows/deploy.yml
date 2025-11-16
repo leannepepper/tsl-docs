@@ -38,6 +38,8 @@ jobs:
             export NEXT_PUBLIC_BASE_PATH="/${GITHUB_REPOSITORY#*/}"
           fi
           npm run build
+        env:
+          FS_TOKEN: ${{ secrets.FS_TOKEN }}
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
