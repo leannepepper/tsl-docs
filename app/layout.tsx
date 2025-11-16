@@ -16,8 +16,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Design System",
-  description: "Design system documentation built with renoun and Next.js.",
+  title: "TSL Docs",
+  description: "TSL documentation built with renoun.",
   robots: {
     index: false,
     follow: false,

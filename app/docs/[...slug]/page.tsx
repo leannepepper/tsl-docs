@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Headings,
   Reference,
@@ -6,16 +5,17 @@ import {
   isFile,
   type Directory,
   type ReferenceComponents,
+  type File,
 } from "renoun";
 import { notFound } from "next/navigation";
 
 import { OnThisPage } from "@/app/components/OnThisPage";
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
 import { tslDir } from "@/app/lib/tsl-collections";
-import {
-  RECENT_BADGE_LABEL,
-  getRecentExportNamesForRoute,
-} from "@/app/lib/recent-exports";
+// import {
+//   RECENT_BADGE_LABEL,
+//   getRecentExportNamesForRoute,
+// } from "@/app/lib/recent-exports";
 
 export const dynamic = "error"; // disallow runtime rendering
 export const revalidate = false; // not ISR
@@ -23,6 +23,22 @@ export const dynamicParams = false; // only the params you return below
 
 type StaticPageParams = { slug: string[] };
 type RouteParams = { slug: string | string[] };
+
+async function getLastModifiedLabel(
+  file: File
+): Promise<string | undefined> {
+  const lastCommitDate = await file.getLastCommitDate();
+
+  if (!lastCommitDate) {
+    return undefined;
+  }
+
+  return lastCommitDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 async function collectFileParams(
   directory: Directory<any>
@@ -74,9 +90,9 @@ export default async function Page({
     return notFound();
   }
 
-  const docsRoute = `/docs/${pathname}`;
-  const recentExports = await getRecentExportNamesForRoute(docsRoute);
-  const referenceComponents = createReferenceComponents(recentExports);
+  const lastModifiedLabel = await getLastModifiedLabel(file);
+
+  const referenceComponents = createReferenceComponents();
   const exports = await file.getExports();
   const headings: Headings = (exports ?? []).map((exp: any) => ({
     id: exp.getName(),
@@ -88,6 +104,11 @@ export default async function Page({
     <>
       <DocsHeaderTitle title={file.getTitle()} />
       <main className="docs-content">
+        {lastModifiedLabel ? (
+          <p className="docs-last-modified">
+            Last modified on: {lastModifiedLabel}
+          </p>
+        ) : null}
         <Reference source={file as any} components={referenceComponents} />
       </main>
       <aside className="docs-toc">
@@ -97,9 +118,7 @@ export default async function Page({
   );
 }
 
-const createReferenceComponents = (
-  recentExports: Set<string>
-): Partial<ReferenceComponents> => ({
+const createReferenceComponents = (): Partial<ReferenceComponents> => ({
   Section: ({ id, kind, children }) => (
     <section
       id={id}
@@ -110,28 +129,22 @@ const createReferenceComponents = (
       {children}
     </section>
   ),
-  SectionHeading: ({ label, title, ["aria-label"]: ariaLabel }) => {
-    const showRecentBadge = !!title && recentExports.has(title);
-    return (
-      <div className="reference-heading">
-        <div className="reference-heading__meta">
-          {label ? (
-            <span className="reference-heading__label">
-              {label.toUpperCase()}
-            </span>
-          ) : null}
-          {showRecentBadge ? (
-            <span className="badge badge--recent">{RECENT_BADGE_LABEL}</span>
-          ) : null}
-        </div>
-        {title ? (
-          <h2 className="reference-heading__title" aria-label={ariaLabel}>
-            {title}
-          </h2>
+  SectionHeading: ({ label, title, ["aria-label"]: ariaLabel }) => (
+    <div className="reference-heading">
+      <div className="reference-heading__meta">
+        {label ? (
+          <span className="reference-heading__label">
+            {label.toUpperCase()}
+          </span>
         ) : null}
       </div>
-    );
-  },
+      {title ? (
+        <h2 className="reference-heading__title" aria-label={ariaLabel}>
+          {title}
+        </h2>
+      ) : null}
+    </div>
+  ),
   SectionBody: ({ hasDescription, children }) => (
     <div
       className={cx(
@@ -155,9 +168,7 @@ const createReferenceComponents = (
   Description: ({ children }) => (
     <p className="reference-description">{children}</p>
   ),
-  Detail: ({ children }) => (
-    <div className="reference-detail">{children}</div>
-  ),
+  Detail: ({ children }) => <div className="reference-detail">{children}</div>,
   DetailHeading: ({ children }) => (
     <p className="reference-detail__heading">{children}</p>
   ),
@@ -199,7 +210,9 @@ const createReferenceComponents = (
     <td
       className={cx(
         "reference-table__cell",
-        typeof index === "number" ? `reference-table__cell--${index}` : undefined
+        typeof index === "number"
+          ? `reference-table__cell--${index}`
+          : undefined
       )}
       colSpan={colSpan}
     >

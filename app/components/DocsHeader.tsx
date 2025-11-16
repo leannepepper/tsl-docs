@@ -74,12 +74,37 @@ export function DocsHeaderBar() {
     setSearchActive,
   } = useDocsHeaderContext();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isCompact, setIsCompact] = useState(false);
+  const hasScrolledForSearch = useRef(false);
 
   useEffect(() => {
     if (isSearchActive) {
       inputRef.current?.focus();
     }
   }, [isSearchActive]);
+
+  useEffect(() => {
+    const trimmed = searchQuery.trim();
+    if (trimmed && !hasScrolledForSearch.current) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      hasScrolledForSearch.current = true;
+    } else if (!trimmed) {
+      hasScrolledForSearch.current = false;
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const shouldBeCompact = window.scrollY > 8;
+      setIsCompact((prev) =>
+        prev === shouldBeCompact ? prev : shouldBeCompact
+      );
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleTrigger = () => {
     setSearchActive(true);
@@ -99,7 +124,7 @@ export function DocsHeaderBar() {
   };
 
   return (
-    <header className="docs-header">
+    <header className={`docs-header${isCompact ? " docs-header--compact" : ""}`}>
       <div className="docs-header__brand">TSL</div>
       <div className="docs-header__slot">
         {isSearchActive ? (

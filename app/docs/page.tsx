@@ -1,14 +1,12 @@
 import Link from "next/link";
 
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
-import {
-  RECENT_BADGE_LABEL,
-  RECENT_WINDOW_DAYS,
-  getRecentExportsList,
-} from "@/app/lib/recent-exports";
+import { getRecentExportsList } from "@/app/lib/recent-exports";
+
+const RECENT_WINDOW_DAYS = 24;
 
 export default async function Page() {
-  const recentExports = await getRecentExportsList(24);
+  // const recentExports = await getRecentExportsList();
 
   return (
     <>
@@ -25,7 +23,7 @@ export default async function Page() {
             Click an item to open its page and scroll directly to the new API.
           </p>
         </section>
-        {recentExports.length ? (
+        {/* {recentExports.length ? (
           <ul className="recent-grid">
             {recentExports.map((entry) => (
               <li key={`${entry.route}-${entry.exportName}`}>
@@ -60,7 +58,7 @@ export default async function Page() {
               No exports have shipped in the last {RECENT_WINDOW_DAYS} days.
             </p>
           </div>
-        )}
+        )} */}
       </main>
     </>
   );
