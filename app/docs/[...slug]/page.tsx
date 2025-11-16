@@ -24,9 +24,7 @@ export const dynamicParams = false; // only the params you return below
 type StaticPageParams = { slug: string[] };
 type RouteParams = { slug: string | string[] };
 
-async function getLastModifiedLabel(
-  file: File
-): Promise<string | undefined> {
+async function getLastModifiedLabel(file: File): Promise<string | undefined> {
   const lastCommitDate = await file.getLastCommitDate();
 
   if (!lastCommitDate) {
@@ -129,15 +127,8 @@ const createReferenceComponents = (): Partial<ReferenceComponents> => ({
       {children}
     </section>
   ),
-  SectionHeading: ({ label, title, ["aria-label"]: ariaLabel }) => (
+  SectionHeading: ({ title, ["aria-label"]: ariaLabel }) => (
     <div className="reference-heading">
-      <div className="reference-heading__meta">
-        {label ? (
-          <span className="reference-heading__label">
-            {label.toUpperCase()}
-          </span>
-        ) : null}
-      </div>
       {title ? (
         <h2 className="reference-heading__title" aria-label={ariaLabel}>
           {title}
@@ -172,6 +163,7 @@ const createReferenceComponents = (): Partial<ReferenceComponents> => ({
   DetailHeading: ({ children }) => (
     <p className="reference-detail__heading">{children}</p>
   ),
+  // Tags: () => null,
   Signatures: ({ children }) => (
     <div className="reference-signatures">{children}</div>
   ),

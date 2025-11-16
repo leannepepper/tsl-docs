@@ -38,8 +38,8 @@ export default function HeroBackground() {
       smoothstep,
     } = TSL as any;
     const timeSignal = time;
-    const topColor = color(0x2b4b85);
-    const bottomColor = color(0x0e2448);
+    const topColor = color(0xf5f1e7);
+    const bottomColor = color(0x050403);
 
     // base vertical gradient with gentle motion
     const v = uv().y.add(oscSine(timeSignal).mul(0.05));

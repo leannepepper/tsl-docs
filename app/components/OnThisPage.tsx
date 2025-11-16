@@ -65,7 +65,8 @@ export function OnThisPage({ headings, entry }: SiteTableOfContentsProps) {
               color: "var(--color-foreground)",
             },
             "&[aria-current]": {
-              color: "var(--color-accent)",
+              color: "var(--color-foreground)",
+              fontWeight: 500,
             },
           }}
         />
