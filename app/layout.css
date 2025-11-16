@@ -21,8 +21,8 @@
   --docs-header-height-expanded: clamp(5rem, 10vw, 6.25rem);
   --docs-header-height-compact: clamp(3.25rem, 5vw, 4rem);
   --docs-header-scroll-range: 120px;
-  --hero-accent: #f5f1e7;
-  --hero-kicker: #c2bbad;
+  --hero-accent: #4dd2ff;
+  --hero-kicker: #9ca0ae;
 }
 
 *,
