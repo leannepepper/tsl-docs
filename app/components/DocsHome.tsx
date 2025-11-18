@@ -1,11 +1,9 @@
-import Link from "next/link";
-
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
-import { getRecentExportsList } from "@/app/lib/recent-exports";
+// import { getRecentExportsList } from "@/app/lib/recent-exports";
 
 const RECENT_WINDOW_DAYS = 24;
 
-export default async function Page() {
+export async function DocsHome() {
   // const recentExports = await getRecentExportsList();
 
   return (

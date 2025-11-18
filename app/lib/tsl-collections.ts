@@ -26,7 +26,7 @@ export const constantsPath = path.join(TSL_ROOT, "core", "constants.js");
 // Base directory for all TSL files
 export const tslDir = new Directory({
   path: TSL_ROOT,
-  basePathname: "/docs/tsl",
+  basePathname: "/",
   slugCasing: "kebab",
   fileSystem: threeRepoFs,
   filter: "**/*.js",

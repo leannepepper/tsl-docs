@@ -31,7 +31,7 @@ export function DocsHeaderProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const isDocsHome = pathname === "/docs" || pathname === "/docs/";
+    const isDocsHome = pathname === "/";
     setSearchQuery("");
     setSearchActive(isDocsHome);
   }, [pathname]);
@@ -111,7 +111,9 @@ export function DocsHeaderBar() {
 
   return (
     <header className="docs-header">
-      <div className="docs-header__brand">TSL</div>
+      <Link href="/#docs" className="docs-header__brand">
+        TSL
+      </Link>
       <div className="docs-header__slot">
         {isSearchActive ? (
           <label className="docs-header__input-wrap">
@@ -212,22 +214,22 @@ const MOCK_RESULTS: SearchResult[] = [
   {
     title: "Math · Math Node",
     description: "Compose math operations that run directly in your shader.",
-    href: "/docs/math/math-node",
+    href: "/math/math-node",
   },
   {
     title: "Core · Array Node",
     description: "Build reusable inputs and structs for complex graphs.",
-    href: "/docs/core/array-node",
+    href: "/core/array-node",
   },
   {
     title: "Code · Scriptable Node",
     description: "Author custom snippets that inject GLSL at compile time.",
-    href: "/docs/code/scriptable-node",
+    href: "/code/scriptable-node",
   },
   {
     title: "Display · Tone Mapping Node",
     description: "Apply ACES-style tonemapping before presenting frames.",
-    href: "/docs/display/tone-mapping-node",
+    href: "/display/tone-mapping-node",
   },
 ];
 

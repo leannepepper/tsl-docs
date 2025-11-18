@@ -5,7 +5,10 @@ import { isDirectory, type Directory, type FileSystemEntry } from "renoun";
 function getHref(entry: FileSystemEntry) {
   const relative = entry.getPathname({ includeBasePathname: false });
   const normalized = relative.startsWith("/") ? relative : `/${relative}`;
-  return `/docs${normalized}`;
+  if (normalized === "/") {
+    return "/#docs";
+  }
+  return normalized;
 }
 
 async function getChildren(directory: Directory<any>): Promise<NavItem[]> {

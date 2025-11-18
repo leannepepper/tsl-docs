@@ -1,18 +1,13 @@
-import Sidebar from "../components/Sidebar";
+import type { ReactNode } from "react";
+
+import Sidebar from "./Sidebar";
 import {
   DocsHeaderBar,
   DocsHeaderProvider,
   DocsSearchSlot,
-} from "../components/DocsHeader";
-import { tslCategories } from "../lib/tsl-collections";
+} from "./DocsHeader";
 
-export async function generateStaticParams() {
-  // one page per category (including "constants")
-  return tslCategories.map((c) => ({ category: c.key }));
-}
-
-export default async function APILayout(props: any) {
-  const { children } = props;
+export function DocsShell({ children }: { children: ReactNode }) {
   return (
     <DocsHeaderProvider>
       <div className="docs-layout">

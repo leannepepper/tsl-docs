@@ -1,34 +1,42 @@
-import Link from "next/link";
 import HeroBackground from "./components/HeroBackground";
+import { DocsHome } from "./components/DocsHome";
+import { DocsShell } from "./components/DocsShell";
 
 export default function Page() {
   return (
-    <main className="home-hero">
-      <HeroBackground />
-      <div className="home-hero__content">
-        <p className="home-hero__kicker">unofficial</p>
-        <div
-          className="home-hero__words"
-          aria-label="Three Shader Language Docs"
-        >
-          <div>
-            <span>T</span>
-            hree
+    <main>
+      <section className="home-hero">
+        <HeroBackground />
+        <div className="home-hero__content">
+          <p className="home-hero__kicker">unofficial</p>
+          <div
+            className="home-hero__words"
+            aria-label="Three Shader Language Docs"
+          >
+            <div>
+              <span>T</span>
+              hree
+            </div>
+            <div>
+              <span>S</span>
+              hader
+            </div>
+            <div>
+              <span>L</span>
+              anguage
+            </div>
+            <div>Docs</div>
           </div>
-          <div>
-            <span>S</span>
-            hader
-          </div>
-          <div>
-            <span>L</span>
-            anguage
-          </div>
-          <div>Docs</div>
+          <a href="#docs" className="home-hero__cta">
+            Go to Docs
+          </a>
         </div>
-        <Link href="/docs" className="home-hero__cta">
-          Go to Docs
-        </Link>
-      </div>
+      </section>
+      <section id="docs" className="home-docs">
+        <DocsShell>
+          <DocsHome />
+        </DocsShell>
+      </section>
     </main>
   );
 }

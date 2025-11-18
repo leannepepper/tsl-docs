@@ -893,6 +893,12 @@ img {
   z-index: 0;
 }
 
+.home-docs {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+  scroll-margin-top: 2rem;
+}
+
 /* ---------------- Responsive ---------------- */
 @media (max-width: 1200px) {
   :root {

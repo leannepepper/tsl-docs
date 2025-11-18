@@ -163,7 +163,6 @@ const createReferenceComponents = (): Partial<ReferenceComponents> => ({
   DetailHeading: ({ children }) => (
     <p className="reference-detail__heading">{children}</p>
   ),
-  // Tags: () => null,
   Signatures: ({ children }) => (
     <div className="reference-signatures">{children}</div>
   ),
