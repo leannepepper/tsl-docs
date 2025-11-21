@@ -23,6 +23,7 @@ declare module "three/webgpu" {
 declare module "three" {
   export const Scene: any;
   export const PerspectiveCamera: any;
+  export const OrthographicCamera: any;
   export const PlaneGeometry: any;
   export const Mesh: any;
 }

@@ -835,7 +835,8 @@ img {
 .home-hero {
   display: grid;
   place-items: center;
-  min-height: calc(100vh - 4rem);
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: 2rem 1rem 4rem;
   position: relative;
   overflow: clip;
@@ -894,9 +895,8 @@ img {
 }
 
 .home-docs {
-  padding-top: 2rem;
   padding-bottom: 4rem;
-  scroll-margin-top: 2rem;
+  scroll-margin-top: 0;
 }
 
 /* ---------------- Responsive ---------------- */
