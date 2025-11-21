@@ -294,20 +294,20 @@ img {
 .docs-shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--toc-width);
-  background: var(--color-stage);
+  background: transparent;
   min-height: 65vh;
 }
 
 .docs-sidebar {
   border-right: 1px solid var(--color-border);
   padding: 2.75rem 2rem;
-  background: var(--color-stage);
+  background: transparent;
 }
 
 .docs-content {
   padding: 2.75rem 5rem 3rem;
   min-height: 100%;
-  background: var(--color-stage);
+  background: transparent;
 }
 
 .docs-home {
@@ -351,12 +351,7 @@ img {
   padding: 1.5rem;
   border-radius: 1.25rem;
   border: 1px solid rgba(245, 241, 231, 0.12);
-  background: radial-gradient(
-      circle at 15% 15%,
-      rgba(245, 241, 231, 0.08),
-      rgba(8, 7, 6, 0.85)
-    ),
-    rgba(12, 11, 9, 0.82);
+  background: transparent;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -832,6 +827,16 @@ img {
 }
 
 /* ---------------- Home hero ---------------- */
+.home-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-shell > section {
+  position: relative;
+  z-index: 1;
+}
+
 .home-hero {
   display: grid;
   place-items: center;
@@ -892,11 +897,32 @@ img {
   width: 100%;
   height: 100%;
   z-index: 0;
+  pointer-events: none;
+  transform: translateY(var(--hero-bg-shift, 0px));
+  will-change: transform;
 }
 
 .home-docs {
+  position: relative;
+  z-index: 1;
   padding-bottom: 4rem;
   scroll-margin-top: 0;
+}
+
+.home-docs .docs-layout {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.home-docs .docs-header {
+  background: transparent;
+  border-bottom-color: rgba(245, 241, 231, 0.15);
+  box-shadow: none;
+}
+
+.home-docs .docs-shell {
+  background: transparent;
 }
 
 /* ---------------- Responsive ---------------- */

@@ -4,9 +4,9 @@ import { DocsShell } from "./components/DocsShell";
 
 export default function Page() {
   return (
-    <main>
+    <main className="home-shell">
+      <HeroBackground />
       <section className="home-hero">
-        <HeroBackground />
         <div className="home-hero__content">
           <p className="home-hero__kicker">unofficial</p>
           <div

@@ -8,9 +8,15 @@ export default function HeroBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const rendererRef = useRef<any | null>(null);
+  const scrollRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
+    const heroSection = document.querySelector(
+      ".home-hero",
+    ) as HTMLElement | null;
+    const docsSection = document.getElementById("docs");
+    const hostElement = canvas.parentElement as HTMLElement | null;
 
     const renderer = new WebGPURenderer({ canvas, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -159,6 +165,23 @@ export default function HeroBackground() {
     const mesh = new THREE.Mesh(geometry, nodeMaterial) as any;
     scene.add(mesh);
 
+    const updateScrollShift = () => {
+      if (!heroSection) return;
+      const heroTop = heroSection.offsetTop;
+      const docsTop =
+        (docsSection && docsSection.offsetTop) ??
+        heroTop + heroSection.offsetHeight;
+      const range = Math.max(1, docsTop - heroTop);
+      const progress = Math.min(
+        1,
+        Math.max(0, (window.scrollY - heroTop) / range),
+      );
+      const shift = progress * heroSection.offsetHeight;
+      const shiftValue = `${shift}px`;
+      canvas.style.setProperty("--hero-bg-shift", shiftValue);
+      hostElement?.style.setProperty("--hero-bg-shift", shiftValue);
+    };
+
     const onResize = () => {
       const { clientWidth, clientHeight } = canvas.parentElement!;
       const width = clientWidth;
@@ -174,9 +197,20 @@ export default function HeroBackground() {
 
       // stretch horizontally to fill viewport while keeping clip-space coverage
       (mesh as any).scale.set(aspect, 1, 1);
+      updateScrollShift();
     };
     onResize();
     window.addEventListener("resize", onResize);
+
+    const onScroll = () => {
+      if (scrollRafRef.current !== null) return;
+      scrollRafRef.current = requestAnimationFrame(() => {
+        scrollRafRef.current = null;
+        updateScrollShift();
+      });
+    };
+    updateScrollShift();
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     const tick = () => {
       renderer.render(scene, camera);
@@ -187,6 +221,13 @@ export default function HeroBackground() {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", onScroll);
+      if (scrollRafRef.current !== null) {
+        cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = null;
+      }
+      canvas.style.removeProperty("--hero-bg-shift");
+      hostElement?.style.removeProperty("--hero-bg-shift");
       try {
         // @ts-expect-error setAnimationLoop exists on WebGPURenderer
         renderer.setAnimationLoop && renderer.setAnimationLoop(null);
