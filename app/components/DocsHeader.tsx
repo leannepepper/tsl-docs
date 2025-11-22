@@ -31,9 +31,8 @@ export function DocsHeaderProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const isDocsHome = pathname === "/";
     setSearchQuery("");
-    setSearchActive(isDocsHome);
+    setSearchActive(false);
   }, [pathname]);
 
   const value = useMemo(
@@ -74,7 +73,6 @@ export function DocsHeaderBar() {
     setSearchActive,
   } = useDocsHeaderContext();
   const inputRef = useRef<HTMLInputElement>(null);
-  const hasScrolledForSearch = useRef(false);
 
   useEffect(() => {
     if (isSearchActive) {
@@ -82,15 +80,6 @@ export function DocsHeaderBar() {
     }
   }, [isSearchActive]);
 
-  useEffect(() => {
-    const trimmed = searchQuery.trim();
-    if (trimmed && !hasScrolledForSearch.current) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      hasScrolledForSearch.current = true;
-    } else if (!trimmed) {
-      hasScrolledForSearch.current = false;
-    }
-  }, [searchQuery]);
 
   const handleTrigger = () => {
     setSearchActive(true);

@@ -19,7 +19,6 @@ import { tslDir } from "@/app/lib/tsl-collections";
 
 export const dynamic = "error"; // disallow runtime rendering
 export const revalidate = false; // not ISR
-export const dynamicParams = false; // only the params you return below
 
 type StaticPageParams = { slug: string[] };
 type RouteParams = { slug: string | string[] };
