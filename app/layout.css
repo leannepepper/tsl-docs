@@ -21,7 +21,7 @@
   --docs-header-height-expanded: clamp(5rem, 10vw, 6.25rem);
   --docs-header-height-compact: clamp(3.25rem, 5vw, 4rem);
   --docs-header-scroll-range: 120px;
-  --hero-accent: #4dd2ff;
+  --hero-accent: #48bed7;
   --hero-kicker: #9ca0ae;
 }
 
@@ -72,7 +72,12 @@ img {
 /* ------------------- Docs chrome ------------------- */
 .docs-layout {
   margin: 0;
-  background: var(--color-stage);
+  background: radial-gradient(
+    circle at 50% -10%,
+    #0a1226 0,
+    #010104 55%,
+    #000000 100%
+  );
   border: 1px solid var(--color-border);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
   display: flex;
@@ -83,7 +88,12 @@ img {
 .docs-header {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
-  background: var(--color-background);
+  background: radial-gradient(
+    circle at 50% -10%,
+    #0a1226 0,
+    #010104 55%,
+    #000000 100%
+  );
   color: var(--color-foreground);
   border-bottom: 1px solid rgba(245, 241, 231, 0.1);
   min-height: var(--docs-header-height-expanded);
@@ -289,6 +299,17 @@ img {
       animation: none;
     }
   }
+}
+
+/* Disable docs header scroll animation on home page */
+.home-docs .docs-header,
+.home-docs .docs-header__brand,
+.home-docs .docs-header__slot,
+.home-docs .docs-header__trigger,
+.home-docs .docs-header__input,
+.home-docs .docs-header__trigger svg,
+.home-docs .docs-header__input-wrap svg {
+  animation: none;
 }
 
 .docs-shell {
@@ -851,7 +872,7 @@ img {
 .home-hero__content {
   min-width: 25%;
   margin: 0 auto;
-  grid-template-rows: 0fr 2fr 1fr;
+  /* grid-template-rows: 0fr 2fr 1fr; */
   display: grid;
   align-items: center;
   position: relative;
@@ -874,7 +895,8 @@ img {
   line-height: 1.1;
   letter-spacing: 0.2rem;
   margin: 0.2rem 0;
-  font-family: var(--font-display), 'Iceberg', sans-serif;
+  font-family: var(--font-body), 'Space Grotesk', system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .home-hero__cta {

@@ -8,7 +8,6 @@ export default function Page() {
       <HeroBackground />
       <section className="home-hero">
         <div className="home-hero__content">
-          <p className="home-hero__kicker">unofficial</p>
           <div
             className="home-hero__words"
             aria-label="Three Shader Language Docs"
@@ -25,7 +24,7 @@ export default function Page() {
               <span>L</span>
               anguage
             </div>
-            <div>Docs</div>
+            <p className="home-hero__kicker">unofficial documentation</p>
           </div>
           <a href="#docs" className="home-hero__cta">
             Go to Docs
