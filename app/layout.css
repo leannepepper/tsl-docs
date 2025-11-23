@@ -9,11 +9,20 @@
   --color-muted: #c2bbad;
   --color-accent: #f5f1e7;
   --color-type: #6ca8ff;
-  --color-stage: linear-gradient(
-    180deg,
-    rgba(15, 14, 12, 0.98),
-    rgba(5, 5, 4, 0.95)
-  );
+  /* site-wide stage background: related to home hero, but very subtle teal on interior pages */
+  --color-stage: radial-gradient(
+      circle at 8% 0%,
+      #000317 0,
+      rgba(0, 3, 23, 0.9) 35%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 92% 82%,
+      rgba(7, 84, 90, 0.25) 0,
+      rgba(2, 20, 27, 0.95) 48%,
+      #000000 100%
+    ),
+    linear-gradient(180deg, #08183a 0%, #02252b 60%, #010307 100%);
   --sidebar-width: 260px;
   --toc-width: 260px;
   --content-gutter: 1rem;
@@ -72,12 +81,7 @@ img {
 /* ------------------- Docs chrome ------------------- */
 .docs-layout {
   margin: 0;
-  background: radial-gradient(
-    circle at 50% -10%,
-    #0a1226 0,
-    #010104 55%,
-    #000000 100%
-  );
+  background: transparent;
   border: 1px solid var(--color-border);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
   display: flex;
@@ -88,12 +92,8 @@ img {
 .docs-header {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
-  background: radial-gradient(
-    circle at 50% -10%,
-    #0a1226 0,
-    #010104 55%,
-    #000000 100%
-  );
+  /* solid header on interior pages so content doesn't show through */
+  background: #000316;
   color: var(--color-foreground);
   border-bottom: 1px solid rgba(245, 241, 231, 0.1);
   min-height: var(--docs-header-height-expanded);
