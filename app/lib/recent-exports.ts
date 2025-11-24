@@ -7,7 +7,7 @@ import {
 
 import { tslDir } from "@/app/lib/tsl-collections";
 
-export const RECENT_WINDOW_DAYS = 365;
+export const RECENT_WINDOW_DAYS = 90;
 
 export type RecentExport = {
   name: string;
@@ -22,6 +22,11 @@ export type RecentExport = {
   /** Path-like label showing the directory and file where the export lives. */
   breadcrumb: string;
 };
+
+// Simple per-process cache so we don't have to walk the entire TSL tree on
+// every request. This is especially helpful in development where the server
+// restarts frequently anyway.
+let recentExportsCache: RecentExport[] | null = null;
 
 async function collectRecentExportsFromDirectory(
   directory: Directory<any>,
@@ -91,6 +96,10 @@ async function collectRecentExportsFromDirectory(
 }
 
 export async function getRecentExportsList(): Promise<RecentExport[]> {
+  if (recentExportsCache) {
+    return recentExportsCache;
+  }
+
   const now = new Date();
   const cutoff = new Date(
     now.getTime() - RECENT_WINDOW_DAYS * 24 * 60 * 60 * 1000
@@ -100,5 +109,6 @@ export async function getRecentExportsList(): Promise<RecentExport[]> {
   // Sort newest first.
   exports.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
+  recentExportsCache = exports;
   return exports;
 }

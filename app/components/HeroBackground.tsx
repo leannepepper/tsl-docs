@@ -48,34 +48,23 @@ export default function HeroBackground() {
     const verticalFade = smoothstep(0.0, 1.0, uv().y.mul(0.9).add(0.08));
     const baseGradient = mix(baseBottom, baseTop, verticalFade);
 
-    // soft diagonal glow in the lower-right
-    const uvCoord = uv();
-    // teal highlight spot, static position
-    const glowCenter = vec2(0.9, 0.4);
-    const glowVec = uvCoord.sub(glowCenter);
-    const glowDist = length(glowVec.mul(vec2(1.6, 2.2)));
-    const glowMask = oneMinus(saturate(smoothstep(0.08, 0.7, glowDist)));
+	    // soft diagonal glow toward the bottom-right
+	    const uvCoord = uv();
+	    // teal highlight spot, static position (bottom-right)
+	    const glowCenter = vec2(0.9, 0.18);
+	    const glowVec = uvCoord.sub(glowCenter);
+	    const glowDist = length(glowVec.mul(vec2(1.4, 1.9)));
+	    const glowMask = oneMinus(saturate(smoothstep(0.0, 0.9, glowDist)));
 
-    const glowOuter = color(0x07545a); // slightly deeper, less saturated teal
-    const glowInner = color(0x4ac6e0); // softer cyan for a smoother blend
-    const glowColor = mix(glowOuter, glowInner, glowMask);
+	    const glowOuter = color(0x04545a); // outer teal, close to base
+	    const glowInner = color(0x2a8ea9); // slightly darker, softer teal
+	    const glowColor = mix(glowOuter, glowInner, glowMask);
 
-    // when at the top of the page, show the teal glow;
-    // as the user scrolls down, fade the glow out and replace it with a darker blue
-    const glowStrength = oneMinus(saturate(docsProgress));
-    const glowLit = mix(
-      baseGradient,
-      glowColor,
-      glowMask.mul(0.6).mul(glowStrength)
-    );
-
-    const glowFadeColor = color(0x020819); // darker blue replacement in docs view
-    const glowFadeStrength = saturate(docsProgress);
-    const withGlow = mix(
-      glowLit,
-      glowFadeColor,
-      glowMask.mul(0.4).mul(glowFadeStrength)
-    );
+	    // brighten the center and smoothly blend into the base gradient,
+	    // while gently dimming the glow as you scroll into the docs.
+	    const glowStrength = oneMinus(saturate(docsProgress.mul(1.2)));
+	    const glowFactor = glowMask.mul(glowMask).mul(0.5).mul(glowStrength);
+	    const withGlow = mix(baseGradient, glowColor, glowFactor);
 
     // darker blue focus in the upper-left corner
     const cornerCenter = vec2(0.02, 0.08);
@@ -85,13 +74,14 @@ export default function HeroBackground() {
     const cornerColor = color(0x000317);
     const withCornerShade = mix(withGlow, cornerColor, cornerMask.mul(1.0));
 
-    // vignette to keep focus near center and soften edges
-    const vignette = smoothstep(
-      0.1,
-      0.95,
-      length(uv().sub(vec2(0.5, 0.45)).mul(1.4))
-    );
-    const vignetted = mix(withCornerShade, color(0x000006), vignette);
+	    // vignette to keep focus near center and soften edges,
+	    // but ease it out toward the bottom so the teal glow
+	    // can reach the lower corners.
+	    const vignetteRadius = length(uv().sub(vec2(0.5, 0.45)).mul(1.4));
+	    const baseVignette = smoothstep(0.1, 0.95, vignetteRadius);
+	    const bottomEase = smoothstep(0.18, 0.45, uv().y);
+	    const vignette = baseVignette.mul(bottomEase);
+	    const vignetted = mix(withCornerShade, color(0x000006), vignette);
     const finalColor = vignetted;
 
     const nodeMaterial = new MeshBasicNodeMaterial();
@@ -100,7 +90,7 @@ export default function HeroBackground() {
     const mesh = new THREE.Mesh(geometry, nodeMaterial) as any;
     scene.add(mesh);
 
-    const updateScrollShift = () => {
+    const updateScrollProgress = () => {
       if (!heroSection) return;
       const heroTop = heroSection.offsetTop;
       const docsTop =
@@ -111,17 +101,12 @@ export default function HeroBackground() {
         1,
         Math.max(0, (window.scrollY - heroTop) / range)
       );
-      const shift = progress * heroSection.offsetHeight;
-      const shiftValue = `${shift}px`;
-      canvas.style.setProperty("--hero-bg-shift", shiftValue);
-      hostElement?.style.setProperty("--hero-bg-shift", shiftValue);
       docsProgress.value = progress;
     };
 
     const onResize = () => {
-      const { clientWidth, clientHeight } = canvas.parentElement!;
-      const width = clientWidth;
-      const height = clientHeight;
+      const width = window.innerWidth || canvas.clientWidth;
+      const height = window.innerHeight || canvas.clientHeight;
       renderer.setSize(width, height, false);
       const aspect = width / Math.max(1, height);
 
@@ -133,7 +118,7 @@ export default function HeroBackground() {
 
       // stretch horizontally to fill viewport while keeping clip-space coverage
       (mesh as any).scale.set(aspect, 1, 1);
-      updateScrollShift();
+      updateScrollProgress();
     };
     onResize();
     window.addEventListener("resize", onResize);
@@ -142,10 +127,10 @@ export default function HeroBackground() {
       if (scrollRafRef.current !== null) return;
       scrollRafRef.current = requestAnimationFrame(() => {
         scrollRafRef.current = null;
-        updateScrollShift();
+        updateScrollProgress();
       });
     };
-    updateScrollShift();
+    updateScrollProgress();
     window.addEventListener("scroll", onScroll, { passive: true });
 
     const tick = () => {
@@ -162,8 +147,6 @@ export default function HeroBackground() {
         cancelAnimationFrame(scrollRafRef.current);
         scrollRafRef.current = null;
       }
-      canvas.style.removeProperty("--hero-bg-shift");
-      hostElement?.style.removeProperty("--hero-bg-shift");
       try {
         // @ts-expect-error setAnimationLoop exists on WebGPURenderer
         renderer.setAnimationLoop && renderer.setAnimationLoop(null);

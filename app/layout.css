@@ -356,47 +356,59 @@ img {
   color: rgba(245, 241, 231, 0.6);
 }
 
-.recent-grid {
+.recent-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-}
-
-.recent-card {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
-  padding: 1.5rem;
-  border-radius: 1.25rem;
-  border: 1px solid rgba(245, 241, 231, 0.12);
   background: transparent;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  overflow: hidden;
 }
 
-.recent-card:hover,
-.recent-card:focus-visible {
-  border-color: rgba(245, 241, 231, 0.35);
-  transform: translateY(-4px);
+.recent-list__item {
+  border-bottom: 1px solid rgba(245, 241, 231, 0.3);
 }
 
-.recent-card__meta {
+.recent-list__item:last-child {
+  border-bottom: none;
+}
+
+.recent-list__link {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.25rem 0rem;
+  transition: background 0.18s ease, transform 0.18s ease;
+  flex-direction: column-reverse;
+}
+
+.recent-list__link:hover,
+.recent-list__link:focus-visible {
+  background: rgba(245, 241, 231, 0.03);
+}
+
+.recent-list__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.recent-list__meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  width: 100%;
 }
 
-.recent-card__file {
+.recent-list__file {
   font-size: 0.85rem;
   letter-spacing: 0.35rem;
   text-transform: uppercase;
   color: var(--color-muted);
 }
 
-.recent-card__title {
+.recent-list__title {
   margin: 0;
   font-family: var(--font-display), 'Iceberg', sans-serif;
   font-size: 1.4rem;
@@ -404,13 +416,13 @@ img {
   color: var(--color-foreground);
 }
 
-.recent-card__description {
+.recent-list__description {
   margin: 0;
   color: var(--color-muted);
   line-height: 1.6;
 }
 
-.recent-card__date {
+.recent-list__date {
   font-size: 0.85rem;
   letter-spacing: 0.15rem;
   text-transform: uppercase;
@@ -914,14 +926,12 @@ img {
 }
 
 .home-hero__bg-canvas {
-  position: absolute;
+  position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  transform: translateY(var(--hero-bg-shift, 0px));
-  will-change: transform;
 }
 
 .home-docs {
