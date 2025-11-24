@@ -1,10 +1,13 @@
-import { DocsHeaderTitle } from "@/app/components/DocsHeader";
-// import { getRecentExportsList } from "@/app/lib/recent-exports";
+import Link from "next/link";
 
-const RECENT_WINDOW_DAYS = 24;
+import { DocsHeaderTitle } from "@/app/components/DocsHeader";
+import {
+  getRecentExportsList,
+  RECENT_WINDOW_DAYS,
+} from "@/app/lib/recent-exports";
 
 export async function DocsHome() {
-  // const recentExports = await getRecentExportsList();
+  const recentExports = await getRecentExportsList();
 
   return (
     <>
@@ -21,42 +24,44 @@ export async function DocsHome() {
             Click an item to open its page and scroll directly to the new API.
           </p>
         </section>
-        {/* {recentExports.length ? (
-          <ul className="recent-grid">
-            {recentExports.map((entry) => (
-              <li key={`${entry.route}-${entry.exportName}`}>
-                <Link href={entry.href} className="recent-card">
-                  <div className="recent-card__meta">
-                    <span className="recent-card__file">{entry.fileTitle}</span>
-                    <span className="badge badge--recent">
-                      {RECENT_BADGE_LABEL}
-                    </span>
-                  </div>
-                  <h2 className="recent-card__title">{entry.exportTitle}</h2>
-                  {entry.description ? (
-                    <p className="recent-card__description">
-                      {entry.description}
-                    </p>
-                  ) : null}
-                  <span className="recent-card__date">
-                    Added{" "}
-                    {entry.commitDate.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "2-digit",
-                      year: "numeric",
-                    })}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="recent-empty">
-            <p>
-              No exports have shipped in the last {RECENT_WINDOW_DAYS} days.
+
+        <section aria-label="Recent TSL exports">
+          {recentExports.length === 0 ? (
+            <p className="recent-empty">
+              No exports have been added in the last {RECENT_WINDOW_DAYS} days.
             </p>
-          </div>
-        )} */}
+          ) : (
+            <ul className="recent-grid">
+              {recentExports.map((exp) => (
+                <li key={exp.href}>
+                  <Link href={exp.href} className="recent-card">
+                    <div className="recent-card__meta">
+                      <p className="recent-card__file">{exp.breadcrumb}</p>
+                      <time
+                        className="recent-card__date"
+                        dateTime={exp.createdAt.toISOString()}
+                      >
+                        {exp.createdAt.toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </time>
+                    </div>
+                    <h2 className="recent-card__title">
+                      {exp.title || exp.name}
+                    </h2>
+                    {exp.description ? (
+                      <p className="recent-card__description">
+                        {exp.description}
+                      </p>
+                    ) : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </main>
     </>
   );

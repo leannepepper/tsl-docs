@@ -89,8 +89,29 @@ export default async function Page({
 
   const lastModifiedLabel = await getLastModifiedLabel(file);
 
-  const referenceComponents = createReferenceComponents();
   const exports = await file.getExports();
+
+  const firstCommitDates = await Promise.all(
+    exports.map(async (exp: any) => {
+      return exp.getFirstCommitDate();
+    })
+  );
+
+  const firstCommitByExportName: Record<string, Date | undefined> = {};
+  exports.forEach((exp: any, index: number) => {
+    const name = exp.getName?.();
+    if (name) {
+      firstCommitByExportName[name] = firstCommitDates[index] ?? undefined;
+    }
+  });
+
+  const currentYear = new Date().getFullYear();
+
+  const referenceComponents = createReferenceComponents(
+    firstCommitByExportName,
+    currentYear
+  );
+
   const headings: Headings = (exports ?? []).map((exp: any) => ({
     id: exp.getName(),
     text: exp.getTitle(),
@@ -115,17 +136,32 @@ export default async function Page({
   );
 }
 
-const createReferenceComponents = (): Partial<ReferenceComponents> => ({
-  Section: ({ id, kind, children }) => (
-    <section
-      id={id}
-      data-kind={kind}
-      className="reference-section"
-      style={{ scrollMarginTop: "80px" }}
-    >
-      {children}
-    </section>
-  ),
+const createReferenceComponents = (
+  firstCommitByExportName: Record<string, Date | undefined>,
+  currentYear: number
+): Partial<ReferenceComponents> => ({
+  Section: ({ id, kind, children }) => {
+    const firstCommitDate =
+      typeof id === "string" ? firstCommitByExportName[id] : undefined;
+    const isNew =
+      firstCommitDate && firstCommitDate.getFullYear() === currentYear;
+
+    return (
+      <section
+        id={id}
+        data-kind={kind}
+        className="reference-section"
+        style={{ scrollMarginTop: "80px" }}
+      >
+        {isNew ? (
+          <div className="reference-heading">
+            <span className="badge badge--recent">N E W</span>
+          </div>
+        ) : null}
+        {children}
+      </section>
+    );
+  },
   SectionHeading: ({ title, ["aria-label"]: ariaLabel }) => (
     <div className="reference-heading">
       {title ? (
