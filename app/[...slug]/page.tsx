@@ -6,6 +6,7 @@ import {
   type Directory,
   type ReferenceComponents,
   type File,
+  Markdown,
 } from "renoun";
 import { notFound } from "next/navigation";
 
@@ -192,7 +193,9 @@ const createReferenceComponents = (
     </div>
   ),
   Description: ({ children }) => (
-    <p className="reference-description">{children}</p>
+    <div className="reference-description">
+      <Markdown>{children as string}</Markdown>
+    </div>
   ),
   Detail: ({ children }) => <div className="reference-detail">{children}</div>,
   DetailHeading: ({ children }) => (

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Markdown } from "renoun";
 
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
 import {
@@ -31,9 +32,9 @@ export async function DocsHome() {
                         {exp.title || exp.name}
                       </h2>
                       {exp.description ? (
-                        <p className="recent-list__description">
-                          {exp.description}
-                        </p>
+                        <div className="recent-list__description">
+                          <Markdown>{exp.description}</Markdown>
+                        </div>
                       ) : null}
                     </div>
                     <div className="recent-list__meta">

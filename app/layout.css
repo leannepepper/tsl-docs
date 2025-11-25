@@ -81,7 +81,11 @@ img {
 /* ------------------- Docs chrome ------------------- */
 .docs-layout {
   margin: 0;
-  background: transparent;
+  background: radial-gradient(circle at 0 -12%, #000317 0, transparent 55%),
+    linear-gradient(to bottom, #020417 0%, #08183a 40%, #044a4a 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
   border: 1px solid var(--color-border);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
   display: flex;
@@ -92,8 +96,7 @@ img {
 .docs-header {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
-  /* solid header on interior pages so content doesn't show through */
-  background: #000316;
+  background: #03081e;
   color: var(--color-foreground);
   border-bottom: 1px solid rgba(245, 241, 231, 0.1);
   min-height: var(--docs-header-height-expanded);
@@ -726,6 +729,9 @@ img {
   top: 0;
   align-self: start;
   background: transparent;
+  /* Allow the "On this page" panel to scroll independently from the main content */
+  max-height: calc(100vh - var(--docs-header-height-compact));
+  overflow-y: auto;
 }
 
 .docs-toc .title {
