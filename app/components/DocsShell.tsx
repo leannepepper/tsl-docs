@@ -18,6 +18,19 @@ export function DocsShell({ children }: { children: ReactNode }) {
           </aside>
           <DocsSearchSlot>{children}</DocsSearchSlot>
         </div>
+        <footer className="docs-footer">
+          <span className="docs-footer__text">
+            made with{" "}
+            <a
+              href="https://www.renoun.dev/docs/introduction"
+              target="_blank"
+              rel="noreferrer"
+              className="docs-footer__link"
+            >
+              renoun
+            </a>
+          </span>
+        </footer>
       </div>
     </DocsHeaderProvider>
   );

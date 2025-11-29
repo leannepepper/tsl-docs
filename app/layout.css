@@ -3,7 +3,7 @@
   --color-surface: #13120f;
   --color-panel: #181612;
   --color-panel-soft: #1e1c17;
-  --color-border: #27241e;
+  --color-border: rgba(245, 241, 231, 0.1);
   --color-border-strong: #363229;
   --color-foreground: #f5f1e7;
   --color-muted: #c2bbad;
@@ -103,6 +103,7 @@ img {
   display: flex;
   flex-direction: column;
   overflow: visible;
+  min-height: 100vh;
 }
 
 .docs-header {
@@ -973,6 +974,36 @@ img {
 
 .home-docs .docs-shell {
   background: transparent;
+}
+
+.docs-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  border-top: 1px solid var(--color-border);
+  color: #5b888b;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+}
+
+.docs-footer__link {
+  color: var(--color-foreground);
+  opacity: 0.7;
+}
+
+.docs-footer__link:hover,
+.docs-footer__link:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.home-docs .docs-footer {
+  display: none;
 }
 
 /* ---------------- Responsive ---------------- */
