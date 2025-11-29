@@ -1,5 +1,7 @@
+import { Suspense } from "react";
+
 import HeroBackground from "./components/HeroBackground";
-import { DocsHome } from "./components/DocsHome";
+import { DocsHome, DocsHomeLoading } from "./components/DocsHome";
 import { DocsShell } from "./components/DocsShell";
 
 export default function Page() {
@@ -33,7 +35,9 @@ export default function Page() {
       </section>
       <section id="docs" className="home-docs">
         <DocsShell>
-          <DocsHome />
+          <Suspense fallback={<DocsHomeLoading />}>
+            <DocsHome />
+          </Suspense>
         </DocsShell>
       </section>
     </main>

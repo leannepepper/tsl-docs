@@ -13,6 +13,7 @@ import { notFound } from "next/navigation";
 import { OnThisPage } from "@/app/components/OnThisPage";
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
 import { tslDir } from "@/app/lib/tsl-collections";
+import { markdownComponents } from "@/app/lib/markdown-components";
 // import {
 //   RECENT_BADGE_LABEL,
 //   getRecentExportNamesForRoute,
@@ -194,7 +195,7 @@ const createReferenceComponents = (
   ),
   Description: ({ children }) => (
     <div className="reference-description">
-      <Markdown>{children as string}</Markdown>
+      <Markdown components={markdownComponents}>{children as string}</Markdown>
     </div>
   ),
   Detail: ({ children }) => <div className="reference-detail">{children}</div>,

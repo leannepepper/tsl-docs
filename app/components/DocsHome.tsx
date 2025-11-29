@@ -6,6 +6,7 @@ import {
   getRecentExportsList,
   RECENT_WINDOW_DAYS,
 } from "@/app/lib/recent-exports";
+import { markdownComponents } from "@/app/lib/markdown-components";
 
 export async function DocsHome() {
   const recentExports = await getRecentExportsList();
@@ -33,7 +34,9 @@ export async function DocsHome() {
                       </h2>
                       {exp.description ? (
                         <div className="recent-list__description">
-                          <Markdown>{exp.description}</Markdown>
+                          <Markdown components={markdownComponents}>
+                            {exp.description}
+                          </Markdown>
                         </div>
                       ) : null}
                     </div>
@@ -55,6 +58,22 @@ export async function DocsHome() {
               ))}
             </ul>
           )}
+        </section>
+      </main>
+    </>
+  );
+}
+
+export function DocsHomeLoading() {
+  return (
+    <>
+      <DocsHeaderTitle title="Recently Added" />
+      <main className="docs-content docs-home">
+        <section className="recent-intro">
+          <p>Exports added in the last {RECENT_WINDOW_DAYS} days.</p>
+        </section>
+        <section aria-label="Recent TSL exports">
+          <p className="recent-empty">Loading recent exports...</p>
         </section>
       </main>
     </>
