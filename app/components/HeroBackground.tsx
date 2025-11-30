@@ -17,6 +17,8 @@ export default function HeroBackground() {
     ) as HTMLElement | null;
     const docsSection = document.getElementById("docs");
     const hostElement = canvas.parentElement as HTMLElement | null;
+    const scrollRoot =
+      (hostElement?.closest(".home-shell") as HTMLElement | null) ?? null;
 
     const renderer = new WebGPURenderer({ canvas, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -92,14 +94,16 @@ export default function HeroBackground() {
 
     const updateScrollProgress = () => {
       if (!heroSection) return;
-      const heroTop = heroSection.offsetTop;
+      const scrollTop = scrollRoot ? scrollRoot.scrollTop : window.scrollY;
+      const containerOffset = scrollRoot ? scrollRoot.offsetTop : 0;
+      const heroTop = heroSection.offsetTop - containerOffset;
       const docsTop =
-        (docsSection && docsSection.offsetTop) ??
+        (docsSection ? docsSection.offsetTop - containerOffset : undefined) ??
         heroTop + heroSection.offsetHeight;
       const range = Math.max(1, docsTop - heroTop);
       const progress = Math.min(
         1,
-        Math.max(0, (window.scrollY - heroTop) / range)
+        Math.max(0, (scrollTop - heroTop) / range)
       );
       docsProgress.value = progress;
     };
@@ -131,7 +135,8 @@ export default function HeroBackground() {
       });
     };
     updateScrollProgress();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const scrollTarget: HTMLElement | Window = scrollRoot ?? window;
+    scrollTarget.addEventListener("scroll", onScroll, { passive: true } as any);
 
     const tick = () => {
       renderer.render(scene, camera);
@@ -142,7 +147,7 @@ export default function HeroBackground() {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", onScroll);
+      scrollTarget.removeEventListener("scroll", onScroll);
       if (scrollRafRef.current !== null) {
         cancelAnimationFrame(scrollRafRef.current);
         scrollRafRef.current = null;

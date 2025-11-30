@@ -73,6 +73,8 @@ export function DocsHeaderBar() {
     setSearchActive,
   } = useDocsHeaderContext();
   const inputRef = useRef<HTMLInputElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isSearchActive) {
@@ -80,6 +82,21 @@ export function DocsHeaderBar() {
     }
   }, [isSearchActive]);
 
+  useEffect(() => {
+    const header = headerRef.current;
+    const sentinel = sentinelRef.current;
+    if (!header || !sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        header.classList.toggle("is-stuck", entry.intersectionRatio < 1);
+      },
+      { threshold: [1] }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
   const handleTrigger = () => {
     setSearchActive(true);
@@ -99,43 +116,50 @@ export function DocsHeaderBar() {
   };
 
   return (
-    <header className="docs-header">
-      <Link href="/#docs" className="docs-header__brand">
-        TSL
-      </Link>
-      <div className="docs-header__slot">
-        {isSearchActive ? (
-          <label className="docs-header__input-wrap">
-            <svg viewBox="0 0 64 64" aria-hidden="true">
-              <circle cx="28" cy="28" r="18" />
-              <line x1="40" y1="40" x2="58" y2="58" />
-            </svg>
-            <input
-              ref={inputRef}
-              className="docs-header__input"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              placeholder="Search docs..."
-              aria-label="Search docs"
-            />
-          </label>
-        ) : (
-          <button
-            type="button"
-            className="docs-header__trigger"
-            onClick={handleTrigger}
-          >
-            <svg viewBox="0 0 64 64" aria-hidden="true">
-              <circle cx="28" cy="28" r="18" />
-              <line x1="40" y1="40" x2="58" y2="58" />
-            </svg>
-            <span>{title}</span>
-          </button>
-        )}
-      </div>
-    </header>
+    <>
+      <div
+        ref={sentinelRef}
+        className="docs-header__sentinel"
+        aria-hidden="true"
+      />
+      <header ref={headerRef} className="docs-header">
+        <Link href="/#docs" className="docs-header__brand">
+          TSL
+        </Link>
+        <div className="docs-header__slot">
+          {isSearchActive ? (
+            <label className="docs-header__input-wrap">
+              <svg viewBox="0 0 64 64" aria-hidden="true">
+                <circle cx="28" cy="28" r="18" />
+                <line x1="40" y1="40" x2="58" y2="58" />
+              </svg>
+              <input
+                ref={inputRef}
+                className="docs-header__input"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                placeholder="Search docs..."
+                aria-label="Search docs"
+              />
+            </label>
+          ) : (
+            <button
+              type="button"
+              className="docs-header__trigger"
+              onClick={handleTrigger}
+            >
+              <svg viewBox="0 0 64 64" aria-hidden="true">
+                <circle cx="28" cy="28" r="18" />
+                <line x1="40" y1="40" x2="58" y2="58" />
+              </svg>
+              <span>{title}</span>
+            </button>
+          )}
+        </div>
+      </header>
+    </>
   );
 }
 
