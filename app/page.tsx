@@ -34,7 +34,7 @@ export default function Page() {
         </div>
       </section>
       <section id="docs" className="home-docs">
-        <DocsShell>
+        <DocsShell showBackground={false}>
           <Suspense fallback={<DocsHomeLoading />}>
             <DocsHome />
           </Suspense>

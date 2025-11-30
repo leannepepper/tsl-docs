@@ -4,7 +4,11 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { WebGPURenderer, MeshBasicNodeMaterial, TSL } from "three/webgpu";
 
-export default function HeroBackground() {
+type HeroBackgroundProps = {
+  variant?: "home" | "docs";
+};
+
+export default function HeroBackground({ variant = "home" }: HeroBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const rendererRef = useRef<any | null>(null);
@@ -44,6 +48,7 @@ export default function HeroBackground() {
       uniform,
     } = TSL as any;
     const docsProgress = uniform(0.0);
+    const glowEnabled = uniform(variant === "home" ? 1.0 : 0.0);
     // base vertical gradient (static)
     const baseTop = color(0x08183a); // deep navy
     const baseBottom = color(0x044a4a); // teal
@@ -64,7 +69,9 @@ export default function HeroBackground() {
 
 	    // brighten the center and smoothly blend into the base gradient,
 	    // while gently dimming the glow as you scroll into the docs.
-	    const glowStrength = oneMinus(saturate(docsProgress.mul(1.2)));
+	    const glowStrength = glowEnabled.mul(
+        oneMinus(saturate(docsProgress.mul(1.2)))
+      );
 	    const glowFactor = glowMask.mul(glowMask).mul(0.5).mul(glowStrength);
 	    const withGlow = mix(baseGradient, glowColor, glowFactor);
 
@@ -161,7 +168,7 @@ export default function HeroBackground() {
       } catch {}
       rendererRef.current = null;
     };
-  }, []);
+  }, [variant]);
 
   return <canvas ref={canvasRef} className="home-hero__bg-canvas" />;
 }

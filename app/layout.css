@@ -93,23 +93,21 @@ img {
 /* ------------------- Docs chrome ------------------- */
 .docs-layout {
   margin: 0;
-  background: radial-gradient(circle at 0 -12%, #000317 0, transparent 55%),
-    linear-gradient(to bottom, #020417 0%, #08183a 40%, #044a4a 100%);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
+  background: transparent;
   border: 1px solid var(--color-border);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
   display: flex;
   flex-direction: column;
   overflow: visible;
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 .docs-header {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
-  background: #03081e;
+  background: transparent;
   color: var(--color-foreground);
   border-bottom: 1px solid rgba(245, 241, 231, 0.1);
   min-height: var(--docs-header-height-expanded);
@@ -119,8 +117,7 @@ img {
   box-shadow: none;
   align-items: center;
   transition: background-color 0.25s ease, border-color 0.25s ease,
-    box-shadow 0.25s ease, backdrop-filter 0.25s ease,
-    min-height 0.25s ease;
+    box-shadow 0.25s ease, backdrop-filter 0.25s ease, min-height 0.25s ease;
 }
 
 .docs-header__brand {
@@ -340,7 +337,10 @@ img {
 
 .docs-header.is-stuck {
   min-height: var(--docs-header-height-compact);
+  background: none;
+  border-bottom-color: rgba(245, 241, 231, 0.12);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
 }
 
 .docs-header.is-stuck .docs-header__brand {
@@ -901,7 +901,6 @@ img {
 
 .tree-nav__list .tree-nav__list {
   padding-left: 0.8rem;
-  margin-left: 0.4rem;
   border-left: 1px solid var(--color-border);
 }
 
@@ -1050,13 +1049,6 @@ img {
   box-shadow: none;
 }
 
-.home-docs .docs-header.is-stuck {
-  background: rgba(3, 8, 30, 0.94);
-  border-bottom-color: rgba(245, 241, 231, 0.12);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(10px);
-}
-
 .home-docs .docs-shell {
   background: transparent;
 }
@@ -1074,6 +1066,8 @@ img {
   font-size: 0.85rem;
   letter-spacing: 0.04em;
   text-transform: lowercase;
+  position: relative;
+  z-index: 1;
 }
 
 .docs-footer__link {

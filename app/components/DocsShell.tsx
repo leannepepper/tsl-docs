@@ -6,10 +6,20 @@ import {
   DocsHeaderProvider,
   DocsSearchSlot,
 } from "./DocsHeader";
+import HeroBackground from "./HeroBackground";
 
-export function DocsShell({ children }: { children: ReactNode }) {
+type DocsShellProps = {
+  children: ReactNode;
+  showBackground?: boolean;
+};
+
+export function DocsShell({
+  children,
+  showBackground = true,
+}: DocsShellProps) {
   return (
     <DocsHeaderProvider>
+      {showBackground ? <HeroBackground variant="docs" /> : null}
       <div className="docs-layout">
         <DocsHeaderBar />
         <div className="docs-shell">
