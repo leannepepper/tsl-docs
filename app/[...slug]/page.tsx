@@ -12,6 +12,7 @@ import { notFound } from "next/navigation";
 
 import { OnThisPage } from "@/app/components/OnThisPage";
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
+import { ReferenceRowGroup } from "@/app/components/ReferenceRowGroup";
 import { tslDir } from "@/app/lib/tsl-collections";
 import { markdownComponents } from "@/app/lib/markdown-components";
 // import {
@@ -225,7 +226,9 @@ const createReferenceComponents = (
       {children}
     </tr>
   ),
-  TableRowGroup: ({ children }) => <>{children}</>,
+  TableRowGroup: ({ children, hasSubRow }) => (
+    <ReferenceRowGroup hasSubRow={hasSubRow}>{children}</ReferenceRowGroup>
+  ),
   TableSubRow: ({ children }) => (
     <tr className="reference-table__sub-row">
       <td className="reference-table__sub-cell" colSpan={99}>

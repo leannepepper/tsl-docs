@@ -339,6 +339,10 @@ img {
   border-right: 1px solid var(--color-border);
   padding: 2.75rem 2rem;
   background: transparent;
+  position: sticky;
+  top: var(--docs-header-height-compact);
+  max-height: calc(100vh - var(--docs-header-height-compact));
+  overflow-y: auto;
 }
 
 .docs-content {
@@ -542,7 +546,6 @@ img {
 }
 
 .reference-detail {
-  border-top: 1px solid rgba(245, 241, 231, 0.08);
   padding-top: 1rem;
   display: flex;
   flex-direction: column;
@@ -611,11 +614,6 @@ img {
   gap: 2rem;
 }
 
-.reference-signatures {
-  padding: 0.75rem 0;
-  border-top: 1px solid rgba(245, 241, 231, 0.08);
-}
-
 .reference-table {
   width: 100%;
   border-collapse: collapse;
@@ -645,8 +643,34 @@ img {
   border-bottom: 1px solid rgba(245, 241, 231, 0.08);
 }
 
+.reference-table__row--toggle {
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.reference-table__row--toggle:hover {
+  background: rgba(245, 241, 231, 0.03);
+}
+
+.reference-table__row--toggle:focus-visible {
+  outline: 2px solid rgba(245, 241, 231, 0.22);
+  outline-offset: 2px;
+}
+
 .reference-table__row--has-sub {
   border-bottom: 0;
+}
+
+.reference-table__row--has-sub > .reference-table__cell {
+  padding-top: 0.95rem;
+}
+
+.reference-table__toggle {
+  display: inline-block;
+  width: 0.9rem;
+  color: rgba(245, 241, 231, 0.7);
+  margin-right: 0.35rem;
+  font-size: 0.95rem;
 }
 
 .reference-table__cell {
@@ -658,6 +682,7 @@ img {
 .reference-table__cell--0 {
   font-weight: 600;
   letter-spacing: 0.05em;
+  font-size: 0.9rem;
 }
 
 .reference-table__sub-row {
@@ -666,7 +691,6 @@ img {
 
 .reference-table__sub-cell {
   padding: 0.65rem 0.75rem 1.25rem;
-  border-bottom: 1px solid rgba(245, 241, 231, 0.08);
   color: var(--color-muted);
 }
 

@@ -5,7 +5,7 @@ export const markdownComponents = {
   pre: (props: ComponentProps<"pre">) => (
     <CodeBlock {...parsePreProps(props)} allowErrors showErrors />
   ),
-  code: (props: ComponentProps<"code">) => (
-    <CodeInline {...parseCodeProps(props)} />
-  ),
+  // code: (props: ComponentProps<"code">) => (
+  //   <CodeInline {...parseCodeProps(props)} />
+  // ),
 };
