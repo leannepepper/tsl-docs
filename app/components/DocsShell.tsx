@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Logo } from "renoun";
 
 import Sidebar from "./Sidebar";
 import {
@@ -13,10 +14,7 @@ type DocsShellProps = {
   showBackground?: boolean;
 };
 
-export function DocsShell({
-  children,
-  showBackground = true,
-}: DocsShellProps) {
+export function DocsShell({ children, showBackground = true }: DocsShellProps) {
   return (
     <DocsHeaderProvider>
       {showBackground ? <HeroBackground variant="docs" /> : null}
@@ -29,6 +27,7 @@ export function DocsShell({
           <DocsSearchSlot>{children}</DocsSearchSlot>
         </div>
         <footer className="docs-footer">
+          <GitRepositoryLink />
           <span className="docs-footer__text">
             made with{" "}
             <a
@@ -43,5 +42,19 @@ export function DocsShell({
         </footer>
       </div>
     </DocsHeaderProvider>
+  );
+}
+
+function GitRepositoryLink() {
+  return (
+    <a
+      href="https://github.com/leannepepper/tsl-docs"
+      target="_blank"
+      rel="noreferrer"
+      className="docs-footer__repo-link"
+    >
+      <Logo variant="gitHost" width="1em" height="1em" />
+      <span>View Repository</span>
+    </a>
   );
 }

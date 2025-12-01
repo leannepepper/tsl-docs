@@ -1095,8 +1095,10 @@ img {
 .docs-footer {
   margin-top: auto;
   display: flex;
-  justify-content: flex-end;
-  padding: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
@@ -1114,8 +1116,20 @@ img {
   opacity: 0.7;
 }
 
+.docs-footer__repo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-foreground);
+  opacity: 0.7;
+  text-decoration: none;
+  font-weight: 500;
+}
+
 .docs-footer__link:hover,
-.docs-footer__link:focus-visible {
+.docs-footer__link:focus-visible,
+.docs-footer__repo-link:hover,
+.docs-footer__repo-link:focus-visible {
   opacity: 1;
   text-decoration: underline;
 }
