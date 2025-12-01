@@ -200,9 +200,25 @@ const createReferenceComponents = (
     </div>
   ),
   Detail: ({ children }) => <div className="reference-detail">{children}</div>,
-  DetailHeading: ({ children }) => (
-    <p className="reference-detail__heading">{children}</p>
-  ),
+  DetailHeading: ({ children }) => {
+    const label =
+      typeof children === "string"
+        ? children.trim()
+        : Array.isArray(children) &&
+            children.length === 1 &&
+            typeof children[0] === "string"
+          ? children[0].trim()
+          : undefined;
+
+    if (
+      label &&
+      (label === "Parameters" || label === "Methods" || label === "Accessors")
+    ) {
+      return null;
+    }
+
+    return <p className="reference-detail__heading">{children}</p>;
+  },
   Signatures: ({ children }) => (
     <div className="reference-signatures">{children}</div>
   ),

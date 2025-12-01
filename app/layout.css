@@ -575,7 +575,9 @@ img {
   font-size: 1.75rem;
   font-weight: 500;
   letter-spacing: 0.04em;
-  /* margin: 2.5rem 0 0.75rem; */
+}
+.docs-content p {
+  margin: 0;
 }
 
 .docs-content p,
@@ -725,6 +727,7 @@ img {
   border-collapse: collapse;
   border-spacing: 0;
   margin-top: 0.5rem;
+  background: rgba(245, 241, 231, 0.04);
 }
 
 .reference-table__head {
