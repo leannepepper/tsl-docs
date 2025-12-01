@@ -945,7 +945,7 @@ img {
 
 .tree-nav__link {
   display: block;
-  padding: 0.25rem 0;
+  padding: 0.25rem 0.5rem;
   font-size: 0.95rem;
   letter-spacing: 0.06em;
   color: var(--color-muted);
@@ -960,21 +960,13 @@ img {
 
 .tree-nav__link:hover {
   color: var(--color-foreground);
+  background: rgba(245, 241, 231, 0.04);
 }
 
 .tree-nav__link.is-active {
   color: var(--color-foreground);
   font-weight: 500;
-}
-
-.tree-nav__link.is-active::before {
-  content: '';
-  display: inline-block;
-  width: 0.35rem;
-  height: 0.35rem;
-  margin-right: 0.5rem;
-  border-radius: 999px;
-  background-color: currentColor;
+  background: rgba(245, 241, 231, 0.04);
 }
 
 .tree-nav__group:focus-visible,
