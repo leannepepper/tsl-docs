@@ -25,7 +25,7 @@ type HeaderValue = {
 const DocsHeaderContext = createContext<HeaderValue | undefined>(undefined);
 
 export function DocsHeaderProvider({ children }: { children: ReactNode }) {
-  const [title, setTitle] = useState("Search");
+  const [title, setTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchActive, setSearchActive] = useState(false);
   const pathname = usePathname();
@@ -169,7 +169,7 @@ export function DocsHeaderTitle({ title }: { title: string }) {
   useEffect(() => {
     setTitle(title);
     return () => {
-      setTitle("Search");
+      setTitle("");
     };
   }, [title, setTitle]);
 
@@ -198,7 +198,9 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
             {results.map((result) => (
               <li key={result.href}>
                 <Link href={result.href} className="docs-search__result">
-                  <div className="docs-search__result-title">{result.title}</div>
+                  <div className="docs-search__result-title">
+                    {result.title}
+                  </div>
                   <p>{result.description}</p>
                 </Link>
               </li>
