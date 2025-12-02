@@ -265,8 +265,11 @@ img {
   .home-shell .docs-header__input,
   .home-shell .docs-header__trigger svg,
   .home-shell .docs-header__input-wrap svg {
-    animation-timeline: home-shell-timeline;
-    animation-range: 0 var(--docs-header-scroll-range);
+    /* On the homepage, drive the header animation from the nearest scroll
+       container (.home-shell), and offset the start by 100vh so the hero
+       scrolls first before the docs header begins shrinking. */
+    animation-timeline: scroll(nearest);
+    animation-range: 100vh calc(100vh + var(--docs-header-scroll-range));
   }
 
   @keyframes docs-header-shrink {
