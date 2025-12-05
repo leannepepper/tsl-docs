@@ -9,6 +9,14 @@ export default function Page() {
     <main className="home-shell">
       <HeroBackground />
       <section className="home-hero">
+        <a
+          className="home-hero__official"
+          href="https://threejs.org/docs/index.html#TSL"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Official TSL docs <span aria-hidden="true">→</span>
+        </a>
         <div className="home-hero__content">
           <div
             className="home-hero__words"

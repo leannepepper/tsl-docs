@@ -1106,6 +1106,21 @@ img {
   color: var(--color-foreground);
 }
 
+.home-hero__official {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.75rem;
+  color: var(--hero-kicker);
+  text-decoration: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.14rem;
+  text-transform: uppercase;
+}
+
 .home-hero__content {
   min-width: 25%;
   margin: 0 auto;
