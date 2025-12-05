@@ -64,7 +64,15 @@ function useDocsHeaderContext() {
   return ctx;
 }
 
-export function DocsHeaderBar() {
+type DocsHeaderBarProps = {
+  onToggleMobileNav?: () => void;
+  isMobileNavOpen?: boolean;
+};
+
+export function DocsHeaderBar({
+  onToggleMobileNav,
+  isMobileNavOpen,
+}: DocsHeaderBarProps) {
   const {
     title,
     searchQuery,
@@ -86,6 +94,14 @@ export function DocsHeaderBar() {
     const header = headerRef.current;
     const sentinel = sentinelRef.current;
     if (!header || !sentinel) return;
+
+    // On small/medium screens, keep the header compact and skip sticky animation logic.
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 960px)").matches
+    ) {
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -123,9 +139,11 @@ export function DocsHeaderBar() {
         aria-hidden="true"
       />
       <header ref={headerRef} className="docs-header">
-        <Link href="/#docs" className="docs-header__brand">
-          TSL
-        </Link>
+        <div className="docs-header__brand-wrap">
+          <Link href="/#docs" className="docs-header__brand">
+            TSL
+          </Link>
+        </div>
         <div className="docs-header__slot">
           {isSearchActive ? (
             <label className="docs-header__input-wrap">
@@ -157,6 +175,20 @@ export function DocsHeaderBar() {
               <span>{title}</span>
             </button>
           )}
+          <button
+            type="button"
+            className="docs-header__mobile-toggle"
+            onClick={onToggleMobileNav}
+            aria-label={
+              isMobileNavOpen ? "Close navigation" : "Open navigation"
+            }
+            aria-expanded={!!isMobileNavOpen}
+            aria-controls="docs-mobile-nav"
+          >
+            <span className="docs-header__mobile-toggle-bar" />
+            <span className="docs-header__mobile-toggle-bar" />
+            <span className="docs-header__mobile-toggle-bar" />
+          </button>
         </div>
       </header>
     </>
