@@ -30,10 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RootProvider
-      git="mrdoob/three.js@dev"
-      theme={{ light: "everforest-light", dark: "dracula-soft" }}
-    >
+    <RootProvider git="mrdoob/three.js" theme="everforest-light">
       <html lang="en" suppressHydrationWarning>
         <body className={`${spaceGrotesk.variable} ${iceberg.variable}`}>
           {children}
