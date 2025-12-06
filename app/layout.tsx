@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RootProvider git="mrdoob/three.js" theme="everforest-light">
+    <RootProvider git="mrdoob/three.js@master" theme="everforest-light">
       <html lang="en" suppressHydrationWarning>
         <body className={`${spaceGrotesk.variable} ${iceberg.variable}`}>
           {children}
