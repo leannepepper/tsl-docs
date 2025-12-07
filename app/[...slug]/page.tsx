@@ -35,7 +35,7 @@ async function getLastModifiedLabel(file: File): Promise<string | undefined> {
 
   return lastCommitDate.toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
   });
 }
@@ -127,7 +127,7 @@ export default async function Page({
       <main className="docs-content">
         {lastModifiedLabel ? (
           <p className="docs-last-modified">
-            Last modified on: {lastModifiedLabel}
+            Last modified: {lastModifiedLabel}
           </p>
         ) : null}
         <Reference source={file as any} components={referenceComponents} />
@@ -205,10 +205,10 @@ const createReferenceComponents = (
       typeof children === "string"
         ? children.trim()
         : Array.isArray(children) &&
-            children.length === 1 &&
-            typeof children[0] === "string"
-          ? children[0].trim()
-          : undefined;
+          children.length === 1 &&
+          typeof children[0] === "string"
+        ? children[0].trim()
+        : undefined;
 
     if (
       label &&
