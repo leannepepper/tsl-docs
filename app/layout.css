@@ -1125,7 +1125,7 @@ img {
   place-items: center;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 2rem 1rem 4rem;
+  padding: 2rem 1rem calc(4rem + env(safe-area-inset-bottom, 0px));
   position: relative;
   overflow: clip;
   color: var(--color-foreground);
@@ -1330,6 +1330,11 @@ img {
     border-bottom-color: rgba(245, 241, 231, 0.15);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(10px);
+    background-image: var(--color-stage);
+    background-color: #08183a;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
   }
 
   .docs-header.is-stuck {
