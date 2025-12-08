@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "TSL Docs",
   description: "Unofficial TSL documentation.",
-  metadataBase: new URL("https://leannepepper.github.io/tsl-docs"),
+  metadataBase: new URL("https://leannepepper.github.io"),
   openGraph: {
     title: "TSL Docs",
     description: "Unofficial TSL documentation.",
