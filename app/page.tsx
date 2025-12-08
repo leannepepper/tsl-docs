@@ -39,14 +39,14 @@ export default function Page() {
           <a href="#docs" className="home-hero__cta" aria-label="Go to Docs">
             <span className="sr-only">Go to Docs</span>
             <svg
-              width="323"
-              height="207"
-              viewBox="0 0 323 207"
+              width="84"
+              height="56"
+              viewBox="0 0 169 111"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M165.762 200.927C176.009 200.928 322.829 15.1837 316.069 6.68415C310.291 -0.580865 168.517 52.3993 161.896 52.3993C156.701 52.3993 6.00146 -0.421619 6.00145 10.5469C6.00147 23.6837 158.758 200.927 165.762 200.927Z"
+                d="M86.6456 104.394C91.8181 104.394 165.929 10.636 162.517 6.34564C159.6 2.67845 88.0366 29.4214 84.6942 29.4214C82.0722 29.4214 6.00305 2.75884 6.00303 8.29546C6.00304 14.9265 83.1103 104.394 86.6456 104.394Z"
                 fill="url(#paint0_linear_108_171)"
                 stroke="#5BACB2"
                 strokeWidth="12"
@@ -54,10 +54,10 @@ export default function Page() {
               <defs>
                 <linearGradient
                   id="paint0_linear_108_171"
-                  x1="161.843"
-                  y1="200.945"
-                  x2="160.798"
-                  y2="7.51961"
+                  x1="84.6678"
+                  y1="104.403"
+                  x2="84.1403"
+                  y2="6.76736"
                   gradientUnits="userSpaceOnUse"
                 >
                   <stop offset="0.192308" stopColor="#34CCE0" />
