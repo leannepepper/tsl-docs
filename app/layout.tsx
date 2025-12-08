@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Iceberg, Space_Grotesk } from "next/font/google";
 import { RootProvider } from "renoun";
+import ogImage from "../assets/tsl.png";
 import "./layout.css";
 
 const iceberg = Iceberg({
@@ -17,7 +18,18 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "TSL Docs",
-  description: "TSL documentation built with renoun.",
+  description: "Unofficial TSL documentation.",
+  openGraph: {
+    title: "TSL Docs",
+    description: "Unofficial TSL documentation.",
+    images: [
+      {
+        url: typeof ogImage === "string" ? ogImage : ogImage.src,
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
   robots: {
     index: false,
     follow: false,

@@ -1126,7 +1126,7 @@ img {
   min-height: 100vh;
   min-height: 100dvh;
   padding: 2rem 1rem
-    calc(clamp(3rem, 8vmin, 5rem) + env(safe-area-inset-bottom, 0px));
+    calc(clamp(4rem, 10vmin, 6rem) + env(safe-area-inset-bottom, 0px));
   position: relative;
   overflow: clip;
   color: var(--color-foreground);
@@ -1150,7 +1150,7 @@ img {
 .home-hero__content {
   min-width: 25%;
   margin: 0 auto;
-  min-height: 90vh;
+  min-height: 85vh;
   grid-template-rows: 1fr auto;
   gap: 3rem;
   display: grid;
