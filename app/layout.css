@@ -41,7 +41,7 @@
 }
 
 html {
-  background-color: #08183a;
+  background-color: #000005;
   background-image: var(--color-stage);
   background-repeat: no-repeat;
   background-size: cover;
@@ -52,7 +52,7 @@ html {
 body {
   font-family: var(--font-body), 'Space Grotesk', system-ui, -apple-system,
     BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #08183a;
+  background-color: #000005;
   background-image: var(--color-stage);
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -1126,7 +1126,7 @@ img {
   min-height: 100vh;
   min-height: 100dvh;
   padding: 2rem 1rem
-    calc(clamp(4rem, 10vmin, 6rem) + env(safe-area-inset-bottom, 0px));
+    calc(clamp(4rem, 14vmin, 10rem) + env(safe-area-inset-bottom, 0px));
   position: relative;
   overflow: clip;
   color: var(--color-foreground);
@@ -1150,7 +1150,7 @@ img {
 .home-hero__content {
   min-width: 25%;
   margin: 0 auto;
-  min-height: 85vh;
+  min-height: 83vh;
   grid-template-rows: 1fr auto;
   gap: 3rem;
   display: grid;
@@ -1331,11 +1331,6 @@ img {
     border-bottom-color: rgba(245, 241, 231, 0.15);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(10px);
-    background-image: var(--color-stage);
-    background-color: #08183a;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
   }
 
   .docs-header.is-stuck {
