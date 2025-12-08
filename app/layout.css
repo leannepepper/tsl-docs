@@ -1125,7 +1125,8 @@ img {
   place-items: center;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 2rem 1rem calc(4rem + env(safe-area-inset-bottom, 0px));
+  padding: 2rem 1rem
+    calc(clamp(3rem, 8vmin, 5rem) + env(safe-area-inset-bottom, 0px));
   position: relative;
   overflow: clip;
   color: var(--color-foreground);
