@@ -2,6 +2,7 @@
 
 import { useCallback, useState, type ReactNode } from "react";
 
+import type { SearchResult } from "@/app/lib/search-results";
 import {
   DocsHeaderBar,
   DocsHeaderProvider,
@@ -13,12 +14,14 @@ type DocsShellClientProps = {
   children: ReactNode;
   sidebar: ReactNode;
   showBackground?: boolean;
+  searchResults: SearchResult[];
 };
 
 export function DocsShellClient({
   children,
   sidebar,
   showBackground = true,
+  searchResults,
 }: DocsShellClientProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -31,7 +34,7 @@ export function DocsShellClient({
   }, []);
 
   return (
-    <DocsHeaderProvider>
+    <DocsHeaderProvider searchResults={searchResults}>
       {showBackground ? <HeroBackground variant="docs" /> : null}
       <div className="docs-layout">
         <DocsHeaderBar

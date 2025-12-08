@@ -12,6 +12,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import type { SearchResult } from "@/app/lib/search-results";
 
 type HeaderValue = {
   title: string;
@@ -20,11 +21,18 @@ type HeaderValue = {
   setSearchQuery: (value: string) => void;
   isSearchActive: boolean;
   setSearchActive: (value: boolean) => void;
+  searchResults: SearchResult[];
 };
 
 const DocsHeaderContext = createContext<HeaderValue | undefined>(undefined);
 
-export function DocsHeaderProvider({ children }: { children: ReactNode }) {
+export function DocsHeaderProvider({
+  children,
+  searchResults,
+}: {
+  children: ReactNode;
+  searchResults: SearchResult[];
+}) {
   const [title, setTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchActive, setSearchActive] = useState(false);
@@ -43,8 +51,9 @@ export function DocsHeaderProvider({ children }: { children: ReactNode }) {
       setSearchQuery,
       isSearchActive,
       setSearchActive,
+      searchResults,
     }),
-    [title, searchQuery, isSearchActive]
+    [title, searchQuery, isSearchActive, searchResults]
   );
 
   return (
@@ -209,14 +218,15 @@ export function DocsHeaderTitle({ title }: { title: string }) {
 }
 
 export function DocsSearchSlot({ children }: { children: ReactNode }) {
-  const { searchQuery } = useDocsHeaderContext();
+  const { searchQuery, searchResults } = useDocsHeaderContext();
   const trimmed = searchQuery.trim();
 
   if (!trimmed) {
     return <>{children}</>;
   }
 
-  const results = filterSearchResults(trimmed);
+  const normalized = trimmed.toLowerCase();
+  const results = filterSearchResults(normalized, searchResults);
 
   return (
     <>
@@ -230,10 +240,25 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
             {results.map((result) => (
               <li key={result.href}>
                 <Link href={result.href} className="docs-search__result">
-                  <div className="docs-search__result-title">
-                    {result.title}
+                  <div className="recent-list__main">
+                    <h2 className="recent-list__title">{result.title}</h2>
+                    {result.description ? (
+                      <p className="recent-list__description">
+                        {result.description}
+                      </p>
+                    ) : null}
                   </div>
-                  <p>{result.description}</p>
+                  <div className="recent-list__meta">
+                    <p className="recent-list__file">{result.breadcrumb}</p>
+                    {result.createdAt ? (
+                      <time
+                        className="recent-list__date"
+                        dateTime={result.createdAt}
+                      >
+                        {result.createdAtLabel ?? result.createdAt}
+                      </time>
+                    ) : null}
+                  </div>
                 </Link>
               </li>
             ))}
@@ -251,40 +276,15 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
   );
 }
 
-type SearchResult = {
-  title: string;
-  description: string;
-  href: string;
-};
-
-const MOCK_RESULTS: SearchResult[] = [
-  {
-    title: "Math · Math Node",
-    description: "Compose math operations that run directly in your shader.",
-    href: "/math/math-node",
-  },
-  {
-    title: "Core · Array Node",
-    description: "Build reusable inputs and structs for complex graphs.",
-    href: "/core/array-node",
-  },
-  {
-    title: "Code · Scriptable Node",
-    description: "Author custom snippets that inject GLSL at compile time.",
-    href: "/code/scriptable-node",
-  },
-  {
-    title: "Display · Tone Mapping Node",
-    description: "Apply ACES-style tonemapping before presenting frames.",
-    href: "/display/tone-mapping-node",
-  },
-];
-
-function filterSearchResults(query: string): SearchResult[] {
-  const normalized = query.toLowerCase();
-  return MOCK_RESULTS.filter(
-    (item) =>
-      item.title.toLowerCase().includes(normalized) ||
-      item.description.toLowerCase().includes(normalized)
-  );
+function filterSearchResults(
+  normalizedQuery: string,
+  results: SearchResult[]
+): SearchResult[] {
+  return results.filter((item) => {
+    return (
+      item.titleLower.includes(normalizedQuery) ||
+      (!!item.descriptionLower && item.descriptionLower.includes(normalizedQuery)) ||
+      item.breadcrumbLower.includes(normalizedQuery)
+    );
+  });
 }
