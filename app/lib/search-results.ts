@@ -208,7 +208,7 @@ function shouldSkipEntry(entry: FileSystemEntry): boolean {
 
   const pathname =
     typeof entry.getPathname === "function"
-      ? (entry.getPathname({ includeBasePathname: false }) as string)
+      ? entry.getPathname({ includeBasePathname: false })
       : undefined;
   const last = pathname?.split("/").pop();
   if (!last) return false;
