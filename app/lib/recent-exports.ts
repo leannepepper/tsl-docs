@@ -28,6 +28,22 @@ export type RecentExport = {
 // restarts frequently anyway.
 let recentExportsCache: RecentExport[] | null = null;
 
+function shouldSkipFile(entry: FileSystemEntry): boolean {
+  if (!isFile(entry)) return false;
+
+  const pathname =
+    typeof entry.getPathname === "function"
+      ? entry.getPathname({ includeBasePathname: false })
+      : undefined;
+  const last = pathname?.split("/").pop();
+  if (!last) return false;
+
+  const normalized = last.toLowerCase();
+  return (
+    normalized === "tsl-base" || normalized === "nodes" || normalized === "tsl"
+  );
+}
+
 async function collectRecentExportsFromDirectory(
   directory: Directory<any>,
   cutoff: Date
@@ -42,6 +58,8 @@ async function collectRecentExportsFromDirectory(
       }
 
       if (!isFile(entry)) return [];
+
+      if (shouldSkipFile(entry)) return [];
 
       // TSL directory is filtered to JavaScript files, so these entries should
       // support `getExports` and related APIs.
