@@ -178,7 +178,10 @@ async function createSearchResultFromExport(
       ? exp.getName()
       : undefined;
 
-  const href = slug ? `${pathname}#${slug}` : pathname;
+  const anchor =
+    typeof exp.getName === "function" ? exp.getName() : slug ?? undefined;
+
+  const href = anchor ? `${pathname}#${anchor}` : pathname;
 
   return {
     title,

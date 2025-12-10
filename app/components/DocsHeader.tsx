@@ -12,7 +12,12 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { useCallback } from "react";
 import type { SearchResult } from "@/app/lib/search-results";
+import {
+  attachStableSurmiser,
+  createSurmiserProvider as buildSurmiserProvider,
+} from "@/app/lib/stable-surmiser";
 
 type HeaderValue = {
   title: string;
@@ -25,6 +30,8 @@ type HeaderValue = {
 };
 
 const DocsHeaderContext = createContext<HeaderValue | undefined>(undefined);
+const SURMISER_DEBOUNCE_MS = 120;
+const SURMISER_MIN_CONFIDENCE = 60;
 
 export function DocsHeaderProvider({
   children,
@@ -88,10 +95,15 @@ export function DocsHeaderBar({
     setSearchQuery,
     isSearchActive,
     setSearchActive,
+    searchResults,
   } = useDocsHeaderContext();
   const inputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const surmiserProvider = useMemo(
+    () => buildSurmiserProvider(searchResults),
+    [searchResults]
+  );
 
   useEffect(() => {
     if (isSearchActive) {
@@ -127,11 +139,9 @@ export function DocsHeaderBar({
     setSearchActive(true);
   };
 
-  const handleBlur = () => {
-    if (!searchQuery.trim()) {
-      setSearchActive(false);
-    }
-  };
+  const handleBlur = useCallback(() => {
+    // Keep search open; we rely on Escape or route change to exit search.
+  }, []);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Escape") {
@@ -139,6 +149,59 @@ export function DocsHeaderBar({
       setSearchActive(false);
     }
   };
+
+  useEffect(() => {
+    if (!isSearchActive) return;
+    const input = inputRef.current;
+    if (!input) return;
+    if (document.activeElement !== input) {
+      input.focus({ preventScroll: true });
+    }
+  }, [isSearchActive, searchQuery]);
+
+  useEffect(() => {
+    if (!isSearchActive) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Element | null;
+      if (!target) return;
+
+      const isHeader = headerRef.current?.contains(target);
+      const isSearchSurface = target.closest("[data-search-surface='true']");
+      if (isHeader || isSearchSurface) return;
+
+      setSearchQuery("");
+      setSearchActive(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isSearchActive, setSearchActive, setSearchQuery]);
+
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input || !isSearchActive) return;
+
+    const detach = attachStableSurmiser(input, {
+      providers: [surmiserProvider],
+      debounceMs: SURMISER_DEBOUNCE_MS,
+      minConfidence: SURMISER_MIN_CONFIDENCE,
+      onAccept: () => {
+        setSearchQuery(input.value);
+      },
+    });
+
+    return () => {
+      detach?.();
+    };
+  }, [surmiserProvider, setSearchQuery, isSearchActive]);
+
+  const handleAttachRef = useCallback(
+    (node: HTMLInputElement | null) => {
+      inputRef.current = node;
+    },
+    []
+  );
 
   return (
     <>
@@ -161,7 +224,7 @@ export function DocsHeaderBar({
                 <line x1="40" y1="40" x2="58" y2="58" />
               </svg>
               <input
-                ref={inputRef}
+                ref={handleAttachRef}
                 className="docs-header__input"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
@@ -218,7 +281,12 @@ export function DocsHeaderTitle({ title }: { title: string }) {
 }
 
 export function DocsSearchSlot({ children }: { children: ReactNode }) {
-  const { searchQuery, searchResults } = useDocsHeaderContext();
+  const { searchQuery, searchResults, setSearchActive, setSearchQuery } =
+    useDocsHeaderContext();
+  const clearSearch = useCallback(() => {
+    setSearchQuery("");
+    setSearchActive(false);
+  }, [setSearchActive, setSearchQuery]);
   const trimmed = searchQuery.trim();
 
   if (!trimmed) {
@@ -230,7 +298,10 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <main className="docs-content docs-search">
+      <main
+        className="docs-content docs-search"
+        data-search-surface="true"
+      >
         <p className="docs-search__label">
           Showing {results.length} result{results.length === 1 ? "" : "s"} for “
           {trimmed}”
@@ -239,7 +310,11 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
           <ul className="docs-search__results">
             {results.map((result) => (
               <li key={result.href}>
-                <Link href={result.href} className="docs-search__result">
+                <Link
+                  href={result.href}
+                  className="docs-search__result"
+                  onClick={clearSearch}
+                >
                   <div className="recent-list__main">
                     <h2 className="recent-list__title">{result.title}</h2>
                     {result.description ? (
@@ -269,7 +344,10 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
           </div>
         )}
       </main>
-      <aside className="docs-toc docs-search__sidebar">
+      <aside
+        className="docs-toc docs-search__sidebar"
+        data-search-surface="true"
+      >
         <p>Press Esc to exit search.</p>
       </aside>
     </>
