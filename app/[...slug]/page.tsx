@@ -112,7 +112,8 @@ export default async function Page({
 
   const referenceComponents = createReferenceComponents(
     firstCommitByExportName,
-    currentYear
+    currentYear,
+    lastModifiedLabel
   );
 
   const headings: Headings = (exports ?? []).map((exp: any) => ({
@@ -125,11 +126,6 @@ export default async function Page({
     <>
       <DocsHeaderTitle title={file.getTitle()} />
       <main className="docs-content">
-        {lastModifiedLabel ? (
-          <p className="docs-last-modified">
-            Last modified: {lastModifiedLabel}
-          </p>
-        ) : null}
         <Reference source={file as any} components={referenceComponents} />
       </main>
       <aside className="docs-toc">
@@ -141,134 +137,154 @@ export default async function Page({
 
 const createReferenceComponents = (
   firstCommitByExportName: Record<string, Date | undefined>,
-  currentYear: number
-): Partial<ReferenceComponents> => ({
-  Section: ({ id, kind, children }) => {
-    const firstCommitDate =
-      typeof id === "string" ? firstCommitByExportName[id] : undefined;
-    const isNew =
-      firstCommitDate && firstCommitDate.getFullYear() === currentYear;
+  currentYear: number,
+  lastModifiedLabel?: string
+): Partial<ReferenceComponents> => {
+  let hasShownDate = false;
 
-    return (
-      <section
-        id={id}
-        data-kind={kind}
-        className="reference-section"
-        style={{ scrollMarginTop: "80px" }}
+  return {
+    Section: ({ id, kind, children }) => {
+      const firstCommitDate =
+        typeof id === "string" ? firstCommitByExportName[id] : undefined;
+      const isNew =
+        firstCommitDate && firstCommitDate.getFullYear() === currentYear;
+
+      return (
+        <section
+          id={id}
+          data-kind={kind}
+          className="reference-section"
+          style={{ scrollMarginTop: "80px" }}
+        >
+          {isNew ? (
+            <div className="reference-heading">
+              <span className="badge badge--recent">N E W</span>
+            </div>
+          ) : null}
+          {children}
+        </section>
+      );
+    },
+    SectionHeading: ({ title, ["aria-label"]: ariaLabel }) => {
+      const shouldShowModified = !hasShownDate && !!lastModifiedLabel;
+      if (shouldShowModified) {
+        hasShownDate = true;
+      }
+      return (
+        <div className="reference-heading reference-heading--with-meta">
+          {title ? (
+            <h2 className="reference-heading__title" aria-label={ariaLabel}>
+              {title}
+            </h2>
+          ) : null}
+          {shouldShowModified ? (
+            <span className="reference-heading__meta">
+              Last modified: {lastModifiedLabel}
+            </span>
+          ) : null}
+        </div>
+      );
+    },
+    SectionBody: ({ hasDescription, children }) => (
+      <div
+        className={cx(
+          "reference-body",
+          hasDescription ? "reference-body--with-description" : undefined
+        )}
       >
-        {isNew ? (
-          <div className="reference-heading">
-            <span className="badge badge--recent">N E W</span>
-          </div>
-        ) : null}
         {children}
-      </section>
-    );
-  },
-  SectionHeading: ({ title, ["aria-label"]: ariaLabel }) => (
-    <div className="reference-heading">
-      {title ? (
-        <h2 className="reference-heading__title" aria-label={ariaLabel}>
-          {title}
-        </h2>
-      ) : null}
-    </div>
-  ),
-  SectionBody: ({ hasDescription, children }) => (
-    <div
-      className={cx(
-        "reference-body",
-        hasDescription ? "reference-body--with-description" : undefined
-      )}
-    >
-      {children}
-    </div>
-  ),
-  Column: ({ gap, children }) => (
-    <div className="reference-stack" data-gap={gap ?? undefined}>
-      {children}
-    </div>
-  ),
-  Row: ({ gap, children }) => (
-    <div className="reference-row" data-gap={gap ?? undefined}>
-      {children}
-    </div>
-  ),
-  Description: ({ children }) => (
-    <div className="reference-description">
-      <Markdown components={markdownComponents}>{children as string}</Markdown>
-    </div>
-  ),
-  Detail: ({ children }) => <div className="reference-detail">{children}</div>,
-  DetailHeading: ({ children }) => {
-    const label =
-      typeof children === "string"
-        ? children.trim()
-        : Array.isArray(children) &&
-          children.length === 1 &&
-          typeof children[0] === "string"
-        ? children[0].trim()
-        : undefined;
+      </div>
+    ),
+    Column: ({ gap, children }) => (
+      <div className="reference-stack" data-gap={gap ?? undefined}>
+        {children}
+      </div>
+    ),
+    Row: ({ gap, children }) => (
+      <div className="reference-row" data-gap={gap ?? undefined}>
+        {children}
+      </div>
+    ),
+    Description: ({ children }) => (
+      <div className="reference-description">
+        <Markdown components={markdownComponents}>
+          {children as string}
+        </Markdown>
+      </div>
+    ),
+    Detail: ({ children }) => (
+      <div className="reference-detail">{children}</div>
+    ),
+    DetailHeading: ({ children }) => {
+      const label =
+        typeof children === "string"
+          ? children.trim()
+          : Array.isArray(children) &&
+            children.length === 1 &&
+            typeof children[0] === "string"
+          ? children[0].trim()
+          : undefined;
 
-    if (
-      label &&
-      (label === "Parameters" || label === "Methods" || label === "Accessors")
-    ) {
-      return null;
-    }
+      if (
+        label &&
+        (label === "Parameters" || label === "Methods" || label === "Accessors")
+      ) {
+        return null;
+      }
 
-    return <p className="reference-detail__heading">{children}</p>;
-  },
-  Signatures: ({ children }) => (
-    <div className="reference-signatures">{children}</div>
-  ),
-  Code: ({ children }) => <code className="reference-code">{children}</code>,
-  Table: ({ children }) => (
-    <table className="reference-table">{children}</table>
-  ),
-  TableHead: ({ children }) => (
-    <thead className="reference-table__head">{children}</thead>
-  ),
-  TableBody: ({ children }) => (
-    <tbody className="reference-table__body">{children}</tbody>
-  ),
-  TableRow: ({ hasSubRow, children }) => (
-    <tr
-      className={cx(
-        "reference-table__row",
-        hasSubRow ? "reference-table__row--has-sub" : undefined
-      )}
-    >
-      {children}
-    </tr>
-  ),
-  TableRowGroup: ({ children, hasSubRow }) => (
-    <ReferenceRowGroup hasSubRow={hasSubRow}>{children}</ReferenceRowGroup>
-  ),
-  TableSubRow: ({ children }) => (
-    <tr className="reference-table__sub-row">
-      <td className="reference-table__sub-cell" colSpan={99}>
+      return <p className="reference-detail__heading">{children}</p>;
+    },
+    Signatures: ({ children }) => (
+      <div className="reference-signatures">{children}</div>
+    ),
+    Code: ({ children }) => <code className="reference-code">{children}</code>,
+    Table: ({ children }) => (
+      <table className="reference-table">{children}</table>
+    ),
+    TableHead: ({ children }) => (
+      <thead className="reference-table__head">{children}</thead>
+    ),
+    TableBody: ({ children }) => (
+      <tbody className="reference-table__body">{children}</tbody>
+    ),
+    TableRow: ({ hasSubRow, children }) => (
+      <tr
+        className={cx(
+          "reference-table__row",
+          hasSubRow ? "reference-table__row--has-sub" : undefined
+        )}
+      >
+        {children}
+      </tr>
+    ),
+    TableRowGroup: ({ children, hasSubRow }) => (
+      <ReferenceRowGroup hasSubRow={hasSubRow}>{children}</ReferenceRowGroup>
+    ),
+    TableSubRow: ({ children }) => (
+      <tr className="reference-table__sub-row">
+        <td className="reference-table__sub-cell" colSpan={99}>
+          {children}
+        </td>
+      </tr>
+    ),
+    TableHeader: ({ children }) => (
+      <th className="reference-table__header">{children}</th>
+    ),
+    TableData: ({ children, colSpan, index }) => (
+      <td
+        className={cx(
+          "reference-table__cell",
+          typeof index === "number"
+            ? `reference-table__cell--${index}`
+            : undefined
+        )}
+        colSpan={colSpan}
+      >
         {children}
       </td>
-    </tr>
-  ),
-  TableHeader: ({ children }) => (
-    <th className="reference-table__header">{children}</th>
-  ),
-  TableData: ({ children, colSpan, index }) => (
-    <td
-      className={cx(
-        "reference-table__cell",
-        typeof index === "number"
-          ? `reference-table__cell--${index}`
-          : undefined
-      )}
-      colSpan={colSpan}
-    >
-      {children}
-    </td>
-  ),
-});
+    ),
+  };
+};
 
 function cx(...classes: Array<string | undefined | false>) {
   return classes.filter(Boolean).join(" ");

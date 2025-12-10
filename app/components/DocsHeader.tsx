@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -283,73 +283,130 @@ export function DocsHeaderTitle({ title }: { title: string }) {
 export function DocsSearchSlot({ children }: { children: ReactNode }) {
   const { searchQuery, searchResults, setSearchActive, setSearchQuery } =
     useDocsHeaderContext();
+  const router = useRouter();
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const resultRefs = useRef<Array<HTMLAnchorElement | null>>([]);
   const clearSearch = useCallback(() => {
     setSearchQuery("");
     setSearchActive(false);
   }, [setSearchActive, setSearchQuery]);
   const trimmed = searchQuery.trim();
 
-  if (!trimmed) {
-    return <>{children}</>;
-  }
-
   const normalized = trimmed.toLowerCase();
-  const results = filterSearchResults(normalized, searchResults);
+  const results = trimmed
+    ? filterSearchResults(normalized, searchResults)
+    : [];
+
+  useEffect(() => {
+    setActiveIndex(-1);
+    resultRefs.current = [];
+  }, [normalized, results.length]);
+
+  useEffect(() => {
+    if (!results.length) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (results.length === 0) return;
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setActiveIndex((prev) => (prev + 1) % results.length);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setActiveIndex((prev) =>
+          prev <= 0 ? results.length - 1 : prev - 1
+        );
+      } else if (event.key === "Enter") {
+        if (activeIndex >= 0 && activeIndex < results.length) {
+          event.preventDefault();
+          const href = results[activeIndex].href;
+          clearSearch();
+          router.push(href);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [results, activeIndex, clearSearch, router]);
+
+  useEffect(() => {
+    if (activeIndex < 0) return;
+    const ref = resultRefs.current[activeIndex];
+    if (ref) {
+      ref.focus({ preventScroll: true });
+      ref.scrollIntoView({ block: "nearest" });
+    }
+  }, [activeIndex, results.length]);
 
   return (
     <>
-      <main
-        className="docs-content docs-search"
-        data-search-surface="true"
-      >
-        <p className="docs-search__label">
-          Showing {results.length} result{results.length === 1 ? "" : "s"} for “
-          {trimmed}”
-        </p>
+      {trimmed ? (
+        <>
+          <main
+            className="docs-content docs-search"
+            data-search-surface="true"
+          >
+            <p className="docs-search__label">
+              Showing {results.length} result
+              {results.length === 1 ? "" : "s"} for “{trimmed}”
+            </p>
         {results.length ? (
           <ul className="docs-search__results">
-            {results.map((result) => (
-              <li key={result.href}>
+            {results.map((result, index) => (
+              <li
+                key={result.href}
+                data-active={activeIndex === index || undefined}
+              >
                 <Link
                   href={result.href}
                   className="docs-search__result"
+                  data-active={activeIndex === index || undefined}
                   onClick={clearSearch}
-                >
-                  <div className="recent-list__main">
-                    <h2 className="recent-list__title">{result.title}</h2>
-                    {result.description ? (
-                      <p className="recent-list__description">
-                        {result.description}
-                      </p>
-                    ) : null}
-                  </div>
-                  <div className="recent-list__meta">
-                    <p className="recent-list__file">{result.breadcrumb}</p>
-                    {result.createdAt ? (
-                      <time
-                        className="recent-list__date"
-                        dateTime={result.createdAt}
-                      >
-                        {result.createdAtLabel ?? result.createdAt}
-                      </time>
-                    ) : null}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="docs-search__empty">
-            No matches yet. Try different keywords.
-          </div>
-        )}
-      </main>
-      <aside
-        className="docs-toc docs-search__sidebar"
-        data-search-surface="true"
-      >
-        <p>Press Esc to exit search.</p>
-      </aside>
+                  ref={(node) => {
+                    resultRefs.current[index] = node;
+                  }}
+                      tabIndex={-1}
+                    >
+                      <div className="recent-list__main">
+                        <h2 className="recent-list__title">{result.title}</h2>
+                        {result.description ? (
+                          <p className="recent-list__description">
+                            {result.description}
+                          </p>
+                        ) : null}
+                      </div>
+                      <div className="recent-list__meta">
+                        <p className="recent-list__file">
+                          {result.breadcrumb}
+                        </p>
+                        {result.createdAt ? (
+                          <time
+                            className="recent-list__date"
+                            dateTime={result.createdAt}
+                          >
+                            {result.createdAtLabel ?? result.createdAt}
+                          </time>
+                        ) : null}
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="docs-search__empty">
+                No matches yet. Try different keywords.
+              </div>
+            )}
+          </main>
+          <aside
+            className="docs-toc docs-search__sidebar"
+            data-search-surface="true"
+          >
+            <p>Press Esc to exit search.</p>
+          </aside>
+        </>
+      ) : (
+        children
+      )}
     </>
   );
 }
