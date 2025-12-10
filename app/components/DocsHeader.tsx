@@ -9,7 +9,7 @@ import {
   useMemo,
   useRef,
   useState,
-  type KeyboardEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
 } from "react";
 import { useCallback } from "react";
@@ -143,7 +143,7 @@ export function DocsHeaderBar({
     // Keep search open; we rely on Escape or route change to exit search.
   }, []);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Escape") {
       setSearchQuery("");
       setSearchActive(false);
@@ -304,7 +304,7 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!results.length) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
       if (results.length === 0) return;
       if (event.key === "ArrowDown") {
         event.preventDefault();
@@ -324,8 +324,8 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
   }, [results, activeIndex, clearSearch, router]);
 
   useEffect(() => {
