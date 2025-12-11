@@ -60,8 +60,6 @@ async function collectFileParams(
 
     if (slugSegments.length === 0) continue;
 
-    if (shouldSkipSlug(slugSegments)) continue;
-
     params.push({ slug: slugSegments });
   }
 
@@ -85,10 +83,6 @@ export default async function Page({
   }
 
   const pathname = segments.join("/");
-
-  if (shouldSkipSlug(segments)) {
-    return notFound();
-  }
 
   const file = await tslDir.getFile(pathname, "js").catch(() => undefined);
 
@@ -294,10 +288,4 @@ const createReferenceComponents = (
 
 function cx(...classes: Array<string | undefined | false>) {
   return classes.filter(Boolean).join(" ");
-}
-
-function shouldSkipSlug(slugSegments: string[]): boolean {
-  if (!slugSegments.length) return false;
-  const last = slugSegments[slugSegments.length - 1].toLowerCase();
-  return last === "tsl";
 }
