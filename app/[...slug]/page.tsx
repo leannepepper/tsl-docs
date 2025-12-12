@@ -22,6 +22,7 @@ import { markdownComponents } from "@/app/lib/markdown-components";
 
 export const dynamic = "error"; // disallow runtime rendering
 export const revalidate = false; // not ISR
+export const dynamicParams = false; // only allow routes from generateStaticParams
 
 type StaticPageParams = { slug: string[] };
 type RouteParams = { slug: string | string[] };
@@ -60,10 +61,44 @@ async function collectFileParams(
 
     if (slugSegments.length === 0) continue;
 
+    // Pre-validate this file's exports at build time.
+    // If type resolution fails, skip this file from static generation.
+    const isValid = await validateFileExports(entry);
+    if (!isValid) {
+      console.warn(`Skipping file from build: ${slugSegments.join("/")}`);
+      continue;
+    }
+
     params.push({ slug: slugSegments });
   }
 
   return params;
+}
+
+/**
+ * Validate that all exports in a file can be type-resolved without errors.
+ * Returns false if any export causes an UnresolvedTypeExpressionError.
+ */
+async function validateFileExports(file: any): Promise<boolean> {
+  try {
+    if (typeof file.getExports !== "function") return true;
+    const exports = await file.getExports();
+    for (const exp of exports) {
+      try {
+        // Force full type resolution - this is what Reference does internally
+        await exp.getType();
+        // Also try getText() which may trigger different resolution paths
+        if (typeof exp.getText === "function") {
+          await exp.getText();
+        }
+      } catch {
+        return false;
+      }
+    }
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function generateStaticParams(): Promise<StaticPageParams[]> {
