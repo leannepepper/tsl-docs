@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "design-system",
+  "name": "unofficial-tsl-docs",
   "scripts": {
     "dev": "renoun next --turbopack",
     "build": "next build",
