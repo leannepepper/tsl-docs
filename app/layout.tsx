@@ -3,6 +3,7 @@ import { Iceberg, Space_Grotesk } from "next/font/google";
 import { RootProvider } from "renoun";
 import ogImage from "../assets/tsl.png";
 import "./layout.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const iceberg = Iceberg({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body className={`${spaceGrotesk.variable} ${iceberg.variable}`}>
           {children}
+          <Analytics />
         </body>
       </html>
     </RootProvider>
