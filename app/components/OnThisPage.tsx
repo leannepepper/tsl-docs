@@ -13,7 +13,7 @@ type SiteTableOfContentsProps = Omit<
   entry?: FileSystemEntry;
 };
 
-export function OnThisPage({ headings, entry }: SiteTableOfContentsProps) {
+export function OnThisPage({ sections, entry }: SiteTableOfContentsProps) {
   const components: Partial<TableOfContentsComponents> = {
     Root: (props) => (
       <nav
@@ -75,7 +75,7 @@ export function OnThisPage({ headings, entry }: SiteTableOfContentsProps) {
   };
 
   return (
-    <BaseTableOfContents headings={headings} components={components}>
+    <BaseTableOfContents sections={sections} components={components}>
       {entry ? (
         <ViewSource
           source={entry}

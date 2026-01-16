@@ -122,14 +122,11 @@ function createSearchResultFromFile(
   breadcrumb: string,
   fallbackDate?: Date
 ): SearchResult | null {
-  const title =
-    typeof file.getTitle === "function" ? file.getTitle() : undefined;
+  const title = typeof file.title === "string" ? file.title : undefined;
   if (!title) return null;
 
   const description =
-    typeof file.getDescription === "function"
-      ? file.getDescription()
-      : undefined;
+    typeof file.description === "string" ? file.description : undefined;
 
   const { createdAt, createdAtLabel } = serializeDate(fallbackDate);
 
@@ -153,15 +150,15 @@ async function createSearchResultFromExport(
   fallbackDate?: Date
 ): Promise<SearchResult | null> {
   const title =
-    typeof exp.getTitle === "function"
-      ? exp.getTitle()
-      : typeof exp.getName === "function"
-      ? exp.getName()
+    typeof exp.title === "string"
+      ? exp.title
+      : typeof exp.name === "string"
+      ? exp.name
       : undefined;
   if (!title) return null;
 
   const description =
-    typeof exp.getDescription === "function" ? exp.getDescription() : undefined;
+    typeof exp.description === "string" ? exp.description : undefined;
 
   const createdAt =
     typeof exp.getFirstCommitDate === "function"
@@ -172,14 +169,14 @@ async function createSearchResultFromExport(
   const { createdAt: isoDate, createdAtLabel } = serializeDate(createdAtDate);
 
   const slug =
-    typeof exp.getSlug === "function"
-      ? exp.getSlug()
-      : typeof exp.getName === "function"
-      ? exp.getName()
+    typeof exp.slug === "string"
+      ? exp.slug
+      : typeof exp.name === "string"
+      ? exp.name
       : undefined;
 
   const anchor =
-    typeof exp.getName === "function" ? exp.getName() : slug ?? undefined;
+    typeof exp.name === "string" ? exp.name : slug ?? undefined;
 
   const href = anchor ? `${pathname}#${anchor}` : pathname;
 

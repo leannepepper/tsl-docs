@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ComponentProps } from "react";
 import { Markdown } from "renoun";
 
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
@@ -7,6 +8,11 @@ import {
   RECENT_WINDOW_DAYS,
 } from "@/app/lib/recent-exports";
 import { markdownComponents } from "@/app/lib/markdown-components";
+
+const recentDescriptionComponents = {
+  ...markdownComponents,
+  a: ({ children }: ComponentProps<"a">) => <span>{children}</span>,
+};
 
 export async function DocsHome() {
   const recentExports = await getRecentExportsList();
@@ -34,7 +40,7 @@ export async function DocsHome() {
                       </h2>
                       {exp.description ? (
                         <div className="recent-list__description">
-                          <Markdown components={markdownComponents}>
+                          <Markdown components={recentDescriptionComponents}>
                             {exp.description}
                           </Markdown>
                         </div>

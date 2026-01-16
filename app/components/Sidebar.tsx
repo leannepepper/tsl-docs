@@ -17,16 +17,14 @@ async function getChildren(directory: Directory<any>): Promise<NavItem[]> {
     entries.map(async (entry: FileSystemEntry) => {
       if (isDirectory(entry)) {
         const nestedChildren = await getChildren(entry);
-
         return {
-          title: entry.getTitle(),
+          title: entry.title,
           href: getHref(entry),
           children: nestedChildren.length > 0 ? nestedChildren : undefined,
         };
       }
-
       return {
-        title: entry.getTitle(),
+        title: entry.title,
         href: getHref(entry),
       };
     })

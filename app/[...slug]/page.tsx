@@ -1,5 +1,5 @@
 import {
-  Headings,
+  Section,
   Reference,
   isDirectory,
   isFile,
@@ -137,7 +137,7 @@ export default async function Page({
 
   const firstCommitByExportName: Record<string, Date | undefined> = {};
   exports.forEach((exp: any, index: number) => {
-    const name = exp.getName?.();
+    const name = exp.name;
     if (name) {
       firstCommitByExportName[name] = firstCommitDates[index] ?? undefined;
     }
@@ -151,20 +151,20 @@ export default async function Page({
     lastModifiedLabel
   );
 
-  const headings: Headings = (exports ?? []).map((exp: any) => ({
-    id: exp.getName(),
-    text: exp.getTitle(),
+  const sections: Section[] = (exports ?? []).map((exp: any) => ({
+    id: exp.name,
+    title: exp.title,
     level: 3,
   }));
 
   return (
     <>
-      <DocsHeaderTitle title={file.getTitle()} />
+      <DocsHeaderTitle title={file.title} />
       <main className="docs-content">
-        <Reference source={file as any} components={referenceComponents} />
+        <Reference source={file} components={referenceComponents} />
       </main>
       <aside className="docs-toc">
-        <OnThisPage headings={headings} entry={file} />
+        <OnThisPage sections={sections} entry={file} />
       </aside>
     </>
   );

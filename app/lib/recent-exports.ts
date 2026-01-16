@@ -94,13 +94,12 @@ async function collectRecentExportsFromDirectory(
 
           if (firstCommitDate < cutoff) return null;
 
-          const name: string = exp.getName();
-          const title: string = exp.getTitle();
-          const slug: string = exp.getSlug();
-          const description: string | undefined =
-            typeof exp.getDescription === "function"
-              ? exp.getDescription()
-              : undefined;
+          const name: string | undefined = exp.name;
+          const title: string | undefined = exp.title;
+          const slug: string | undefined = exp.slug;
+          const description: string | undefined = exp.description;
+
+          if (!name || !title || !slug) return null;
 
           return {
             name,

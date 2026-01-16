@@ -13,7 +13,7 @@ const TSL_WIKI_PATH = "wiki/Three.js-Shading-Language";
 // Use Renoun's GitHostFileSystem to read files directly from the three.js repo
 const threeRepoFs = new GitHostFileSystem({
   repository: "mrdoob/three.js",
-  ref: "master",
+  ref: "dev",
   host: "github",
   include: ["src/nodes"],
   token: process.env.FS_TOKEN,
@@ -38,7 +38,7 @@ const tslDirectoryEntries = await tslDir.getEntries();
 export const tslCategories = tslDirectoryEntries
   .filter((entry: FileSystemEntry) => isDirectory(entry))
   .map((dir) => ({
-    key: dir.getSlug(),
-    label: dir.getTitle(),
+    key: dir.slug,
+    label: dir.title,
     dir,
   }));
