@@ -1,11 +1,4 @@
-import {
-  isDirectory,
-  isFile,
-  type Directory,
-  type FileSystemEntry,
-} from "renoun";
-
-import { tslDir } from "@/app/lib/tsl-collections";
+import { getTslIndex } from "@/app/lib/tsl-index";
 
 export const RECENT_WINDOW_DAYS = 90;
 
@@ -28,97 +21,14 @@ export type RecentExport = {
 // restarts frequently anyway.
 let recentExportsCache: RecentExport[] | null = null;
 
-function shouldSkipFile(entry: FileSystemEntry): boolean {
-  if (!isFile(entry)) return false;
-
-  const pathname =
-    typeof entry.getPathname === "function"
-      ? entry.getPathname({ includeBasePathname: false })
-      : undefined;
-  const last = pathname?.split("/").pop();
+function shouldSkipPathname(pathname: string): boolean {
+  const last = pathname.split("/").pop();
   if (!last) return false;
 
   const normalized = last.toLowerCase();
   return (
     normalized === "tsl-base" || normalized === "nodes" || normalized === "tsl"
   );
-}
-
-async function collectRecentExportsFromDirectory(
-  directory: Directory<any>,
-  cutoff: Date
-): Promise<RecentExport[]> {
-  const entries = await directory.getEntries();
-  const results = await mapWithConcurrency(
-    entries as FileSystemEntry[],
-    8,
-    async (entry) => {
-      if (isDirectory(entry)) {
-        return collectRecentExportsFromDirectory(entry, cutoff);
-      }
-
-      if (!isFile(entry)) return [];
-
-      if (shouldSkipFile(entry)) return [];
-
-      // TSL directory is filtered to JavaScript files, so these entries should
-      // support `getExports` and related APIs.
-      const file: any = entry;
-
-      if (typeof file.getExports !== "function") return [];
-
-      const exports = await file.getExports();
-      if (!exports || exports.length === 0) return [];
-
-      const pathname = file.getPathname({
-        includeBasePathname: false,
-      }) as string;
-      const normalizedPathname = pathname.startsWith("/")
-        ? pathname
-        : `/${pathname}`;
-
-      const breadcrumbSegments = file.getPathnameSegments({
-        includeBasePathname: false,
-      }) as string[];
-      const breadcrumb = breadcrumbSegments.join(" / ");
-
-      const exportResults = await mapWithConcurrency(
-        exports as any[],
-        10,
-        async (exp: any) => {
-          if (typeof exp.getFirstCommitDate !== "function") return null;
-
-          const firstCommitDate: Date | undefined =
-            await exp.getFirstCommitDate();
-          if (!firstCommitDate) return null;
-
-          if (firstCommitDate < cutoff) return null;
-
-          const name: string | undefined = exp.name;
-          const title: string | undefined = exp.title;
-          const slug: string | undefined = exp.slug;
-          const description: string | undefined = exp.description;
-
-          if (!name || !title || !slug) return null;
-
-          return {
-            name,
-            title,
-            slug,
-            description,
-            createdAt: firstCommitDate,
-            filePathname: normalizedPathname,
-            href: `${normalizedPathname}#${slug}`,
-            breadcrumb,
-          } satisfies RecentExport;
-        }
-      );
-
-      return exportResults.filter(Boolean) as RecentExport[];
-    }
-  );
-
-  return results.flat();
 }
 
 export async function getRecentExportsList(): Promise<RecentExport[]> {
@@ -131,37 +41,36 @@ export async function getRecentExportsList(): Promise<RecentExport[]> {
     now.getTime() - RECENT_WINDOW_DAYS * 24 * 60 * 60 * 1000
   );
 
-  const exports = await collectRecentExportsFromDirectory(tslDir, cutoff);
+  const index = await getTslIndex();
+  const exports: RecentExport[] = [];
+
+  for (const file of index.files) {
+    if (shouldSkipPathname(file.pathname)) continue;
+
+    for (const exp of file.exportEntries) {
+      const firstCommitDate = exp.firstCommitDate;
+      if (!firstCommitDate || firstCommitDate < cutoff) continue;
+
+      const name = exp.name;
+      const title = exp.title;
+      const slug = exp.slug;
+      if (!name || !title || !slug) continue;
+
+      exports.push({
+        name,
+        title,
+        slug,
+        description: exp.description,
+        createdAt: firstCommitDate,
+        filePathname: file.pathname,
+        href: exp.href,
+        breadcrumb: file.breadcrumb,
+      });
+    }
+  }
   // Sort newest first.
   exports.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   recentExportsCache = exports;
   return exports;
-}
-
-async function mapWithConcurrency<T, R>(
-  items: T[],
-  limit: number,
-  iterator: (item: T, index: number) => Promise<R>
-): Promise<R[]> {
-  if (items.length === 0) return [];
-  const results: R[] = new Array(items.length);
-  const workers: Array<Promise<void>> = [];
-  let nextIndex = 0;
-
-  const worker = async () => {
-    while (nextIndex < items.length) {
-      const currentIndex = nextIndex;
-      nextIndex += 1;
-      results[currentIndex] = await iterator(items[currentIndex], currentIndex);
-    }
-  };
-
-  const workerCount = Math.min(limit, items.length);
-  for (let i = 0; i < workerCount; i += 1) {
-    workers.push(worker());
-  }
-
-  await Promise.all(workers);
-  return results;
 }

@@ -1,11 +1,8 @@
 import {
-  isDirectory,
-  isFile,
-  type Directory,
-  type FileSystemEntry,
-} from "renoun";
-
-import { tslDir } from "@/app/lib/tsl-collections";
+  getTslIndex,
+  type ExportIndexEntry,
+  type FileIndexEntry,
+} from "@/app/lib/tsl-index";
 
 export type SearchResult = {
   title: string;
@@ -20,9 +17,6 @@ export type SearchResult = {
 };
 
 let searchResultsCache: SearchResult[] | null = null;
-
-const normalizePathname = (pathname: string): string =>
-  pathname.startsWith("/") ? pathname : `/${pathname}`;
 
 const serializeDate = (dateInput?: Date | string) => {
   if (!dateInput) return {};
@@ -41,86 +35,43 @@ const formatDate = (date: Date): string =>
     day: "numeric",
   });
 
-async function collectSearchResults(
-  directory: Directory<any>
-): Promise<SearchResult[]> {
-  const entries = await directory.getEntries();
-  const filteredEntries = entries.filter(
-    (entry) => !shouldSkipEntry(entry as FileSystemEntry)
-  );
-
-  const results = await Promise.all(
-    filteredEntries.map(async (entry: FileSystemEntry) => {
-      if (isDirectory(entry)) {
-        return collectSearchResults(entry);
-      }
-
-      if (!isFile(entry)) {
-        return [];
-      }
-
-      const file: any = entry;
-      const pathname = normalizePathname(
-        file.getPathname({ includeBasePathname: false })
-      );
-      const breadcrumbSegments = file.getPathnameSegments({
-        includeBasePathname: false,
-      }) as string[];
-      const breadcrumb = breadcrumbSegments.join(" / ");
-
-      const fileLastModified =
-        typeof file.getLastCommitDate === "function"
-          ? await file.getLastCommitDate()
-          : undefined;
-
-      const exports =
-        typeof file.getExports === "function" ? await file.getExports() : null;
-
-      if (!exports || exports.length === 0) {
-        const fileResult = createSearchResultFromFile(
-          file,
-          pathname,
-          breadcrumb,
-          fileLastModified
-        );
-        return fileResult ? [fileResult] : [];
-      }
-
-      const exportResults = await Promise.all(
-        (exports as any[]).map(async (exp: any) => {
-          return createSearchResultFromExport(
-            exp,
-            pathname,
-            breadcrumb,
-            fileLastModified
-          );
-        })
-      );
-
-      return exportResults.filter(Boolean) as SearchResult[];
-    })
-  );
-
-  return results.flat();
-}
-
 export async function getSearchResults(): Promise<SearchResult[]> {
   if (searchResultsCache) {
     return searchResultsCache;
   }
 
-  const results = dedupeResults(await collectSearchResults(tslDir));
+  const index = await getTslIndex();
+  const results = dedupeResults(buildSearchResults(index.files));
   results.sort((a, b) => a.title.localeCompare(b.title));
   searchResultsCache = results;
 
   return results;
 }
 
+function buildSearchResults(files: FileIndexEntry[]): SearchResult[] {
+  const results: SearchResult[] = [];
+
+  for (const file of files) {
+    if (shouldSkipPathname(file.pathname)) continue;
+    const exportEntries = file.exportEntries;
+
+    if (!exportEntries.length) {
+      const fileResult = createSearchResultFromFile(file);
+      if (fileResult) results.push(fileResult);
+      continue;
+    }
+
+    for (const exp of exportEntries) {
+      const exportResult = createSearchResultFromExport(exp, file);
+      if (exportResult) results.push(exportResult);
+    }
+  }
+
+  return results;
+}
+
 function createSearchResultFromFile(
-  file: any,
-  pathname: string,
-  breadcrumb: string,
-  fallbackDate?: Date
+  file: FileIndexEntry
 ): SearchResult | null {
   const title = typeof file.title === "string" ? file.title : undefined;
   if (!title) return null;
@@ -128,27 +79,25 @@ function createSearchResultFromFile(
   const description =
     typeof file.description === "string" ? file.description : undefined;
 
-  const { createdAt, createdAtLabel } = serializeDate(fallbackDate);
+  const { createdAt, createdAtLabel } = serializeDate(file.lastCommitDate);
 
   return {
     title,
     description,
-    href: pathname,
-    breadcrumb,
+    href: file.pathname,
+    breadcrumb: file.breadcrumb,
     createdAt,
     createdAtLabel,
     titleLower: title.toLowerCase(),
     descriptionLower: (description ?? "").toLowerCase(),
-    breadcrumbLower: breadcrumb.toLowerCase(),
+    breadcrumbLower: file.breadcrumb.toLowerCase(),
   };
 }
 
-async function createSearchResultFromExport(
-  exp: any,
-  pathname: string,
-  breadcrumb: string,
-  fallbackDate?: Date
-): Promise<SearchResult | null> {
+function createSearchResultFromExport(
+  exp: ExportIndexEntry,
+  file: FileIndexEntry
+): SearchResult | null {
   const title =
     typeof exp.title === "string"
       ? exp.title
@@ -160,36 +109,19 @@ async function createSearchResultFromExport(
   const description =
     typeof exp.description === "string" ? exp.description : undefined;
 
-  const createdAt =
-    typeof exp.getFirstCommitDate === "function"
-      ? await exp.getFirstCommitDate()
-      : undefined;
-
-  const createdAtDate = createdAt ?? fallbackDate;
+  const createdAtDate = exp.firstCommitDate ?? file.lastCommitDate;
   const { createdAt: isoDate, createdAtLabel } = serializeDate(createdAtDate);
-
-  const slug =
-    typeof exp.slug === "string"
-      ? exp.slug
-      : typeof exp.name === "string"
-      ? exp.name
-      : undefined;
-
-  const anchor =
-    typeof exp.name === "string" ? exp.name : slug ?? undefined;
-
-  const href = anchor ? `${pathname}#${anchor}` : pathname;
 
   return {
     title,
     description,
-    href,
-    breadcrumb,
+    href: exp.href,
+    breadcrumb: exp.breadcrumb,
     createdAt: isoDate,
     createdAtLabel,
     titleLower: title.toLowerCase(),
     descriptionLower: (description ?? "").toLowerCase(),
-    breadcrumbLower: breadcrumb.toLowerCase(),
+    breadcrumbLower: exp.breadcrumb.toLowerCase(),
   };
 }
 
@@ -203,14 +135,8 @@ function dedupeResults(results: SearchResult[]): SearchResult[] {
   });
 }
 
-function shouldSkipEntry(entry: FileSystemEntry): boolean {
-  if (!isFile(entry)) return false;
-
-  const pathname =
-    typeof entry.getPathname === "function"
-      ? entry.getPathname({ includeBasePathname: false })
-      : undefined;
-  const last = pathname?.split("/").pop();
+function shouldSkipPathname(pathname: string): boolean {
+  const last = pathname.split("/").pop();
   if (!last) return false;
 
   const normalized = last.toLowerCase();

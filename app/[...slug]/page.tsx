@@ -15,10 +15,7 @@ import { DocsHeaderTitle } from "@/app/components/DocsHeader";
 import { ReferenceRowGroup } from "@/app/components/ReferenceRowGroup";
 import { tslDir } from "@/app/lib/tsl-collections";
 import { markdownComponents } from "@/app/lib/markdown-components";
-// import {
-//   RECENT_BADGE_LABEL,
-//   getRecentExportNamesForRoute,
-// } from "@/app/lib/recent-exports";
+import { getTslIndex, type FileIndexEntry } from "@/app/lib/tsl-index";
 
 export const dynamic = "error"; // disallow runtime rendering
 export const revalidate = false; // not ISR
@@ -27,8 +24,12 @@ export const dynamicParams = false; // only allow routes from generateStaticPara
 type StaticPageParams = { slug: string[] };
 type RouteParams = { slug: string | string[] };
 
-async function getLastModifiedLabel(file: File): Promise<string | undefined> {
-  const lastCommitDate = await file.getLastCommitDate();
+async function getLastModifiedLabel(
+  file: File,
+  fileMeta?: FileIndexEntry
+): Promise<string | undefined> {
+  const lastCommitDate =
+    fileMeta?.lastCommitDate ?? (await file.getLastCommitDate());
 
   if (!lastCommitDate) {
     return undefined;
@@ -61,44 +62,10 @@ async function collectFileParams(
 
     if (slugSegments.length === 0) continue;
 
-    // Pre-validate this file's exports at build time.
-    // If type resolution fails, skip this file from static generation.
-    const isValid = await validateFileExports(entry);
-    if (!isValid) {
-      console.warn(`Skipping file from build: ${slugSegments.join("/")}`);
-      continue;
-    }
-
     params.push({ slug: slugSegments });
   }
 
   return params;
-}
-
-/**
- * Validate that all exports in a file can be type-resolved without errors.
- * Returns false if any export causes an UnresolvedTypeExpressionError.
- */
-async function validateFileExports(file: any): Promise<boolean> {
-  try {
-    if (typeof file.getExports !== "function") return true;
-    const exports = await file.getExports();
-    for (const exp of exports) {
-      try {
-        // Force full type resolution - this is what Reference does internally
-        await exp.getType();
-        // Also try getText() which may trigger different resolution paths
-        if (typeof exp.getText === "function") {
-          await exp.getText();
-        }
-      } catch {
-        return false;
-      }
-    }
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 export async function generateStaticParams(): Promise<StaticPageParams[]> {
@@ -125,21 +92,17 @@ export default async function Page({
     return notFound();
   }
 
-  const lastModifiedLabel = await getLastModifiedLabel(file);
-
-  const exports = await file.getExports();
-
-  const firstCommitDates = await Promise.all(
-    exports.map(async (exp: any) => {
-      return exp.getFirstCommitDate();
-    })
-  );
+  const index = await getTslIndex();
+  const normalizedPathname = pathname.startsWith("/")
+    ? pathname
+    : `/${pathname}`;
+  const fileMeta = index.filesByPath.get(normalizedPathname);
+  const lastModifiedLabel = await getLastModifiedLabel(file, fileMeta);
 
   const firstCommitByExportName: Record<string, Date | undefined> = {};
-  exports.forEach((exp: any, index: number) => {
-    const name = exp.name;
-    if (name) {
-      firstCommitByExportName[name] = firstCommitDates[index] ?? undefined;
+  fileMeta?.exportEntries.forEach((exp) => {
+    if (exp.name) {
+      firstCommitByExportName[exp.name] = exp.firstCommitDate;
     }
   });
 
@@ -151,11 +114,13 @@ export default async function Page({
     lastModifiedLabel
   );
 
-  const sections: Section[] = (exports ?? []).map((exp: any) => ({
-    id: exp.name,
-    title: exp.title,
-    level: 3,
-  }));
+  const sections: Section[] = (fileMeta?.exportEntries ?? [])
+    .filter((exp) => !!exp.name)
+    .map((exp) => ({
+      id: exp.name ?? "",
+      title: exp.title ?? exp.name ?? "",
+      level: 3,
+    }));
 
   return (
     <>
