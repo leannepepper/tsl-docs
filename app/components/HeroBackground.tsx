@@ -145,13 +145,19 @@ export default function HeroBackground({ variant = "home" }: HeroBackgroundProps
     const scrollTarget: HTMLElement | Window = scrollRoot ?? window;
     scrollTarget.addEventListener("scroll", onScroll, { passive: true } as any);
 
+    let disposed = false;
+
     const tick = () => {
       renderer.render(scene, camera);
       rafRef.current = requestAnimationFrame(tick);
     };
-    tick();
+
+    void renderer.init().then(() => {
+      if (!disposed) tick();
+    });
 
     return () => {
+      disposed = true;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", onResize);
       scrollTarget.removeEventListener("scroll", onScroll);

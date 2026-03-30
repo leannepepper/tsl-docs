@@ -1,8 +1,9 @@
-import {
-  getTslIndex,
-  type ExportIndexEntry,
-  type FileIndexEntry,
-} from "@/app/lib/tsl-index";
+import type {
+  FileStructure,
+  ModuleExportStructure,
+} from "renoun";
+
+import { tslDir } from "@/app/lib/tsl-collections";
 
 export type SearchResult = {
   title: string;
@@ -10,60 +11,65 @@ export type SearchResult = {
   href: string;
   breadcrumb: string;
   createdAt?: string; // ISO string
-  createdAtLabel?: string;
-  titleLower: string;
-  descriptionLower: string;
-  breadcrumbLower: string;
 };
 
-let searchResultsCache: SearchResult[] | null = null;
+const normalizePathname = (pathname: string): string =>
+  pathname.startsWith("/") ? pathname : `/${pathname}`;
 
-const serializeDate = (dateInput?: Date | string) => {
+const DOCS_BASE_PATHNAME = "/nodes";
+
+function serializeDate(dateInput?: Date | string) {
   if (!dateInput) return {};
 
-  const date =
-    dateInput instanceof Date ? dateInput : new Date(dateInput as string);
+  const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
   if (Number.isNaN(date.getTime())) return {};
 
-  return { createdAt: date.toISOString(), createdAtLabel: formatDate(date) };
-};
+  return {
+    createdAt: date.toISOString(),
+  };
+}
 
-const formatDate = (date: Date): string =>
-  date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
+async function loadSearchResults(): Promise<SearchResult[]> {
+  const structure = await tslDir.getStructure({
+    includeExports: "headers",
+    includeSections: false,
+    includeResolvedTypes: false,
+    includeGitDates: "first",
+    includeAuthors: false,
+    includeTags: false,
   });
-
-export async function getSearchResults(): Promise<SearchResult[]> {
-  if (searchResultsCache) {
-    return searchResultsCache;
-  }
-
-  const index = await getTslIndex();
-  const results = dedupeResults(buildSearchResults(index.files));
+  const results = dedupeResults(collectSearchResults(structure));
   results.sort((a, b) => a.title.localeCompare(b.title));
-  searchResultsCache = results;
-
   return results;
 }
 
-function buildSearchResults(files: FileIndexEntry[]): SearchResult[] {
+export async function getSearchResults(): Promise<SearchResult[]> {
+  return loadSearchResults();
+}
+
+function collectSearchResults(structure: Array<FileStructure | any>): SearchResult[] {
   const results: SearchResult[] = [];
 
-  for (const file of files) {
-    if (shouldSkipPathname(file.pathname)) continue;
-    const exportEntries = file.exportEntries;
+  for (const item of structure) {
+    if (item.kind !== "File") continue;
 
-    if (!exportEntries.length) {
-      const fileResult = createSearchResultFromFile(file);
-      if (fileResult) results.push(fileResult);
-      continue;
+    if (shouldSkipPath(item.path)) continue;
+
+    const pathname = toDocsPathname(item.path);
+    const breadcrumb = toBreadcrumb(item.path);
+
+    const fileResult = createSearchResultFromFile(item, pathname, breadcrumb);
+    if (fileResult) {
+      results.push(fileResult);
     }
 
-    for (const exp of exportEntries) {
-      const exportResult = createSearchResultFromExport(exp, file);
-      if (exportResult) results.push(exportResult);
+    if (!item.exports || item.exports.length === 0) continue;
+
+    for (const exp of item.exports as ModuleExportStructure[]) {
+      const exportResult = createSearchResultFromExport(exp, pathname, breadcrumb);
+      if (exportResult) {
+        results.push(exportResult);
+      }
     }
   }
 
@@ -71,57 +77,43 @@ function buildSearchResults(files: FileIndexEntry[]): SearchResult[] {
 }
 
 function createSearchResultFromFile(
-  file: FileIndexEntry
+  file: FileStructure,
+  pathname: string,
+  breadcrumb: string
 ): SearchResult | null {
-  const title = typeof file.title === "string" ? file.title : undefined;
+  const title = file.title;
   if (!title) return null;
 
-  const description =
-    typeof file.description === "string" ? file.description : undefined;
-
-  const { createdAt, createdAtLabel } = serializeDate(file.lastCommitDate);
+  const description = file.description;
+  const { createdAt } = serializeDate(file.firstCommitDate);
 
   return {
     title,
     description,
-    href: file.pathname,
-    breadcrumb: file.breadcrumb,
+    href: pathname,
+    breadcrumb,
     createdAt,
-    createdAtLabel,
-    titleLower: title.toLowerCase(),
-    descriptionLower: (description ?? "").toLowerCase(),
-    breadcrumbLower: file.breadcrumb.toLowerCase(),
   };
 }
 
 function createSearchResultFromExport(
-  exp: ExportIndexEntry,
-  file: FileIndexEntry
+  exp: ModuleExportStructure,
+  pathname: string,
+  breadcrumb: string
 ): SearchResult | null {
-  const title =
-    typeof exp.title === "string"
-      ? exp.title
-      : typeof exp.name === "string"
-      ? exp.name
-      : undefined;
+  const title = exp.title || exp.name;
   if (!title) return null;
 
-  const description =
-    typeof exp.description === "string" ? exp.description : undefined;
-
-  const createdAtDate = exp.firstCommitDate ?? file.lastCommitDate;
-  const { createdAt: isoDate, createdAtLabel } = serializeDate(createdAtDate);
+  const description = exp.description;
+  const href = toDocsPathname(exp.path);
+  const { createdAt } = serializeDate(exp.firstCommitDate);
 
   return {
     title,
     description,
-    href: exp.href,
-    breadcrumb: exp.breadcrumb,
-    createdAt: isoDate,
-    createdAtLabel,
-    titleLower: title.toLowerCase(),
-    descriptionLower: (description ?? "").toLowerCase(),
-    breadcrumbLower: exp.breadcrumb.toLowerCase(),
+    href,
+    breadcrumb,
+    createdAt,
   };
 }
 
@@ -135,12 +127,33 @@ function dedupeResults(results: SearchResult[]): SearchResult[] {
   });
 }
 
-function shouldSkipPathname(pathname: string): boolean {
-  const last = pathname.split("/").pop();
+function shouldSkipPath(pathname: string): boolean {
+  const normalizedPath = toDocsPathname(pathname);
+  const last = normalizedPath.split("/").pop();
   if (!last) return false;
 
   const normalized = last.toLowerCase();
   return (
     normalized === "tsl-base" || normalized === "nodes" || normalized === "tsl"
   );
+}
+
+function toDocsPathname(pathname: string): string {
+  const normalized = normalizePathname(pathname);
+  if (normalized === DOCS_BASE_PATHNAME) {
+    return "/";
+  }
+
+  if (normalized.startsWith(`${DOCS_BASE_PATHNAME}/`)) {
+    return normalized.slice(DOCS_BASE_PATHNAME.length);
+  }
+
+  return normalized;
+}
+
+function toBreadcrumb(pathname: string): string {
+  return toDocsPathname(pathname)
+    .split("/")
+    .filter(Boolean)
+    .join(" / ");
 }

@@ -14,6 +14,7 @@ import {
 } from "react";
 import { useCallback } from "react";
 import type { SearchResult } from "@/app/lib/search-results";
+import { loadSearchResultsClient } from "@/app/lib/search-results-client";
 import {
   attachStableSurmiser,
   createSurmiserProvider as buildSurmiserProvider,
@@ -26,7 +27,9 @@ type HeaderValue = {
   setSearchQuery: (value: string) => void;
   isSearchActive: boolean;
   setSearchActive: (value: boolean) => void;
-  searchResults: SearchResult[];
+  searchResults: SearchResult[] | null;
+  isSearchResultsLoading: boolean;
+  ensureSearchResults: () => Promise<SearchResult[]>;
 };
 
 const DocsHeaderContext = createContext<HeaderValue | undefined>(undefined);
@@ -35,20 +38,39 @@ const SURMISER_MIN_CONFIDENCE = 60;
 
 export function DocsHeaderProvider({
   children,
-  searchResults,
 }: {
   children: ReactNode;
-  searchResults: SearchResult[];
 }) {
   const [title, setTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchActive, setSearchActive] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null);
+  const [isSearchResultsLoading, setIsSearchResultsLoading] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     setSearchQuery("");
     setSearchActive(false);
   }, [pathname]);
+
+  const ensureSearchResults = useCallback(async () => {
+    if (searchResults) {
+      return searchResults;
+    }
+
+    setIsSearchResultsLoading(true);
+
+    try {
+      const results = await loadSearchResultsClient();
+      setSearchResults(results);
+      return results;
+    } catch (error) {
+      console.warn("[tsl-docs] Failed to load search results.", { error });
+      return [];
+    } finally {
+      setIsSearchResultsLoading(false);
+    }
+  }, [searchResults]);
 
   const value = useMemo(
     () => ({
@@ -59,8 +81,17 @@ export function DocsHeaderProvider({
       isSearchActive,
       setSearchActive,
       searchResults,
+      isSearchResultsLoading,
+      ensureSearchResults,
     }),
-    [title, searchQuery, isSearchActive, searchResults]
+    [
+      title,
+      searchQuery,
+      isSearchActive,
+      searchResults,
+      isSearchResultsLoading,
+      ensureSearchResults,
+    ]
   );
 
   return (
@@ -96,12 +127,13 @@ export function DocsHeaderBar({
     isSearchActive,
     setSearchActive,
     searchResults,
+    ensureSearchResults,
   } = useDocsHeaderContext();
   const inputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const surmiserProvider = useMemo(
-    () => buildSurmiserProvider(searchResults),
+    () => (searchResults ? buildSurmiserProvider(searchResults) : null),
     [searchResults]
   );
 
@@ -137,6 +169,7 @@ export function DocsHeaderBar({
 
   const handleTrigger = () => {
     setSearchActive(true);
+    void ensureSearchResults();
   };
 
   const handleBlur = useCallback(() => {
@@ -179,8 +212,14 @@ export function DocsHeaderBar({
   }, [isSearchActive, setSearchActive, setSearchQuery]);
 
   useEffect(() => {
+    if (isSearchActive) {
+      void ensureSearchResults();
+    }
+  }, [isSearchActive, ensureSearchResults]);
+
+  useEffect(() => {
     const input = inputRef.current;
-    if (!input || !isSearchActive) return;
+    if (!input || !isSearchActive || !surmiserProvider) return;
 
     const detach = attachStableSurmiser(input, {
       providers: [surmiserProvider],
@@ -281,8 +320,14 @@ export function DocsHeaderTitle({ title }: { title: string }) {
 }
 
 export function DocsSearchSlot({ children }: { children: ReactNode }) {
-  const { searchQuery, searchResults, setSearchActive, setSearchQuery } =
-    useDocsHeaderContext();
+  const {
+    searchQuery,
+    searchResults,
+    isSearchResultsLoading,
+    ensureSearchResults,
+    setSearchActive,
+    setSearchQuery,
+  } = useDocsHeaderContext();
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(-1);
   const resultRefs = useRef<Array<HTMLAnchorElement | null>>([]);
@@ -294,8 +339,14 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
 
   const normalized = trimmed.toLowerCase();
   const results = trimmed
-    ? filterSearchResults(normalized, searchResults)
+    ? filterSearchResults(normalized, searchResults ?? [])
     : [];
+
+  useEffect(() => {
+    if (trimmed) {
+      void ensureSearchResults();
+    }
+  }, [trimmed, ensureSearchResults]);
 
   useEffect(() => {
     setActiveIndex(-1);
@@ -383,7 +434,7 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
                             className="recent-list__date"
                             dateTime={result.createdAt}
                           >
-                            {result.createdAtLabel ?? result.createdAt}
+                            {formatSearchDate(result.createdAt)}
                           </time>
                         ) : null}
                       </div>
@@ -391,6 +442,8 @@ export function DocsSearchSlot({ children }: { children: ReactNode }) {
                   </li>
                 ))}
               </ul>
+            ) : isSearchResultsLoading && !searchResults ? (
+              <div className="docs-search__empty">Loading search index...</div>
             ) : (
               <div className="docs-search__empty">
                 No matches yet. Try different keywords.
@@ -416,10 +469,27 @@ function filterSearchResults(
   results: SearchResult[]
 ): SearchResult[] {
   return results.filter((item) => {
+    const title = item.title.toLowerCase();
+    const description = item.description?.toLowerCase() ?? "";
+    const breadcrumb = item.breadcrumb.toLowerCase();
+
     return (
-      item.titleLower.includes(normalizedQuery) ||
-      (!!item.descriptionLower && item.descriptionLower.includes(normalizedQuery)) ||
-      item.breadcrumbLower.includes(normalizedQuery)
+      title.includes(normalizedQuery) ||
+      (!!description && description.includes(normalizedQuery)) ||
+      breadcrumb.includes(normalizedQuery)
     );
+  });
+}
+
+function formatSearchDate(dateInput: string): string {
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) {
+    return dateInput;
+  }
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 }

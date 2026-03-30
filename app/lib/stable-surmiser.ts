@@ -4,6 +4,7 @@ import {
   buildContext,
   type SurmiserOptions,
   type SurmiserProvider,
+  type Suggestion,
 } from "surmiser";
 
 import type { SearchResult } from "@/app/lib/search-results";
@@ -23,7 +24,7 @@ export function attachStableSurmiser(
       renderer.render(
         inputEl.value,
         inputEl.selectionStart || 0,
-        suggestion?.text || null
+        suggestion?.completion || null
       );
       options.onSuggestion?.(suggestion);
     },
@@ -36,7 +37,7 @@ export function attachStableSurmiser(
     renderer.render(
       inputEl.value,
       inputEl.selectionStart || 0,
-      suggestion?.text || null
+      suggestion?.completion || null
     );
   };
 
@@ -59,15 +60,16 @@ export function attachStableSurmiser(
     onInput();
   };
 
-  const acceptSuggestion = (suggestion: { text: string }) => {
+  const acceptSuggestion = (suggestion: Suggestion) => {
     const cursorPos = inputEl.selectionStart || 0;
-    const newValue = inputEl.value.slice(0, cursorPos) + suggestion.text;
+    const newValue =
+      inputEl.value.slice(0, cursorPos) + suggestion.completion;
     inputEl.value = newValue;
     inputEl.setSelectionRange(newValue.length, newValue.length);
     inputEl.dispatchEvent(new Event("input", { bubbles: true }));
     engine.clearSuggestion();
     renderer.render(newValue, newValue.length, null);
-    options.onAccept?.(suggestion as any);
+    options.onAccept?.(suggestion);
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -122,24 +124,21 @@ export function createSurmiserProvider(
       if (signal.aborted) return null;
       const cursor = Number.isFinite(ctx.cursorPosition)
         ? ctx.cursorPosition
-        : ctx.text.length;
-      const query = ctx.text.slice(0, cursor).trim();
+        : ctx.inputValue.length;
+      const query = ctx.inputValue.slice(0, cursor).trim();
       if (!query) return null;
       const normalized = query.toLowerCase();
 
-      let best: { text: string; confidence: number } | null = null;
+      let best: { completion: string; confidence: number } | null = null;
 
       for (const item of searchResults) {
         const suggestionText = getCompletion(normalized, query, item);
         if (!suggestionText) continue;
 
-        const confidence = computeConfidence(
-          normalized.length,
-          item.titleLower.length
-        );
+        const confidence = computeConfidence(normalized.length, item.title.length);
 
         if (!best || confidence > best.confidence) {
-          best = { text: suggestionText, confidence };
+          best = { completion: suggestionText, confidence };
         }
 
         if (confidence === 100) break;
@@ -148,7 +147,7 @@ export function createSurmiserProvider(
       if (!best) return null;
 
       return {
-        text: best.text,
+        completion: best.completion,
         confidence: best.confidence,
         providerId: "tsl-search",
       };
@@ -169,10 +168,10 @@ function getCompletion(
   };
 
   return (
-    tryField(item.title, item.titleLower) ||
-    tryField(item.breadcrumb, item.breadcrumbLower) ||
+    tryField(item.title, item.title.toLowerCase()) ||
+    tryField(item.breadcrumb, item.breadcrumb.toLowerCase()) ||
     (item.description
-      ? tryField(item.description, item.descriptionLower)
+      ? tryField(item.description, item.description.toLowerCase())
       : null) ||
     null
   );

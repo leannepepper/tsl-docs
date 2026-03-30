@@ -1,21 +1,23 @@
 import {
   Section,
   Reference,
-  isDirectory,
-  isFile,
-  type Directory,
+  type FileSystemEntry,
+  type NavigationEntry,
   type ReferenceComponents,
-  type File,
   Markdown,
 } from "renoun";
 import { notFound } from "next/navigation";
 
 import { OnThisPage } from "@/app/components/OnThisPage";
 import { DocsHeaderTitle } from "@/app/components/DocsHeader";
+import { DocsShell } from "@/app/components/DocsShell";
 import { ReferenceRowGroup } from "@/app/components/ReferenceRowGroup";
-import { tslDir } from "@/app/lib/tsl-collections";
 import { markdownComponents } from "@/app/lib/markdown-components";
-import { getTslIndex, type FileIndexEntry } from "@/app/lib/tsl-index";
+import { tslDir } from "@/app/lib/tsl-collections";
+// import {
+//   RECENT_BADGE_LABEL,
+//   getRecentExportNamesForRoute,
+// } from "@/app/lib/recent-exports";
 
 export const dynamic = "error"; // disallow runtime rendering
 export const revalidate = false; // not ISR
@@ -24,52 +26,31 @@ export const dynamicParams = false; // only allow routes from generateStaticPara
 type StaticPageParams = { slug: string[] };
 type RouteParams = { slug: string | string[] };
 
-async function getLastModifiedLabel(
-  file: File,
-  fileMeta?: FileIndexEntry
-): Promise<string | undefined> {
-  const lastCommitDate =
-    fileMeta?.lastCommitDate ?? (await file.getLastCommitDate());
-
-  if (!lastCommitDate) {
-    return undefined;
-  }
-
-  return lastCommitDate.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-async function collectFileParams(
-  directory: Directory<any>
-): Promise<StaticPageParams[]> {
-  const entries = await directory.getEntries();
+function collectFileParams(
+  entries: NavigationEntry<FileSystemEntry>[]
+): StaticPageParams[] {
   const params: StaticPageParams[] = [];
 
-  for (const entry of entries) {
-    if (isDirectory(entry)) {
-      params.push(...(await collectFileParams(entry)));
+  for (const { entry, children } of entries) {
+    if (children && children.length > 0) {
+      params.push(...collectFileParams(children));
       continue;
     }
-
-    if (!isFile(entry)) continue;
 
     const slugSegments = entry.getPathnameSegments({
       includeBasePathname: false,
     });
 
-    if (slugSegments.length === 0) continue;
-
-    params.push({ slug: slugSegments });
+    if (slugSegments.length > 0) {
+      params.push({ slug: slugSegments });
+    }
   }
 
   return params;
 }
 
 export async function generateStaticParams(): Promise<StaticPageParams[]> {
-  return collectFileParams(tslDir);
+  return collectFileParams(await tslDir.getTree());
 }
 
 export default async function Page({
@@ -81,7 +62,7 @@ export default async function Page({
   const segments = Array.isArray(slug) ? slug : [slug].filter(Boolean);
 
   if (!segments.length) {
-    return notFound();
+    notFound();
   }
 
   const pathname = segments.join("/");
@@ -89,22 +70,35 @@ export default async function Page({
   const file = await tslDir.getFile(pathname, "js").catch(() => undefined);
 
   if (!file) {
-    return notFound();
+    notFound();
   }
 
-  const index = await getTslIndex();
-  const normalizedPathname = pathname.startsWith("/")
-    ? pathname
-    : `/${pathname}`;
-  const fileMeta = index.filesByPath.get(normalizedPathname);
-  const lastModifiedLabel = await getLastModifiedLabel(file, fileMeta);
+  const fileEntry = file!;
 
-  const firstCommitByExportName: Record<string, Date | undefined> = {};
-  fileMeta?.exportEntries.forEach((exp) => {
-    if (exp.name) {
-      firstCommitByExportName[exp.name] = exp.firstCommitDate;
-    }
+  const exports = await fileEntry.getExports().catch((err: unknown) => {
+    console.warn(
+      "[tsl-docs] Failed to analyze exports for",
+      pathname,
+      err instanceof Error ? err.message : err
+    );
+    return [];
   });
+
+  const exportNames = exports
+    .map((exp: any) => exp.name)
+    .filter((name: any): name is string => typeof name === "string");
+
+  const historyDates = await Promise.all([
+    fileEntry.getLastCommitDate(),
+    ...exports.map((exp: any) => exp.getFirstCommitDate()),
+  ]);
+  const [lastModifiedDate, ...firstCommitDates] = historyDates;
+  const firstCommitByExportName = Object.fromEntries(
+    exportNames.map((name, index) => [name, firstCommitDates[index]])
+  ) as Record<string, Date | undefined>;
+  const lastModifiedLabel = lastModifiedDate
+    ? formatDate(lastModifiedDate)
+    : undefined;
 
   const currentYear = new Date().getFullYear();
 
@@ -114,25 +108,33 @@ export default async function Page({
     lastModifiedLabel
   );
 
-  const sections: Section[] = (fileMeta?.exportEntries ?? [])
-    .filter((exp) => !!exp.name)
-    .map((exp) => ({
-      id: exp.name ?? "",
-      title: exp.title ?? exp.name ?? "",
-      level: 3,
-    }));
+  const sections: Section[] = (exports ?? []).map((exp: any) => ({
+    id: exp.name,
+    title: exp.title,
+    level: 3,
+  }));
 
   return (
-    <>
-      <DocsHeaderTitle title={file.title} />
-      <main className="docs-content">
-        <Reference source={file} components={referenceComponents} />
-      </main>
-      <aside className="docs-toc">
-        <OnThisPage sections={sections} entry={file} />
-      </aside>
-    </>
+    <DocsShell>
+      <>
+        <DocsHeaderTitle title={fileEntry.title} />
+        <main className="docs-content">
+          <Reference source={file} components={referenceComponents} />
+        </main>
+        <aside className="docs-toc">
+          <OnThisPage sections={sections} entry={file} />
+        </aside>
+      </>
+    </DocsShell>
   );
+}
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 const createReferenceComponents = (
