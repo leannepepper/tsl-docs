@@ -152,6 +152,7 @@ export default function HeroBackground({ variant = "home" }: HeroBackgroundProps
       rafRef.current = requestAnimationFrame(tick);
     };
 
+    // @ts-expect-error init() exists on WebGPURenderer at runtime but is missing from types
     void renderer.init().then(() => {
       if (!disposed) tick();
     });

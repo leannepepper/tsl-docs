@@ -25,7 +25,8 @@
       "three-pkg": ["node_modules/three"],
       "three-pkg/*": ["node_modules/three/*"]
     },
-    "target": "ES2017"
+    "target": "ES2017",
+    "ignoreDeprecations": "6.0"
   },
   "mdx": {
     "checkMdx": true
