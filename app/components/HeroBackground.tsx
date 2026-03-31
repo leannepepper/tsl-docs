@@ -46,6 +46,9 @@ export default function HeroBackground({ variant = "home" }: HeroBackgroundProps
       oneMinus,
       saturate,
       uniform,
+      fract,
+      sin,
+      dot,
     } = TSL as any;
     const docsProgress = uniform(0.0);
     const glowEnabled = uniform(variant === "home" ? 1.0 : 0.0);
@@ -91,7 +94,11 @@ export default function HeroBackground({ variant = "home" }: HeroBackgroundProps
 	    const bottomEase = smoothstep(0.18, 0.45, uv().y);
 	    const vignette = baseVignette.mul(bottomEase);
 	    const vignetted = mix(withCornerShade, color(0x000006), vignette);
-    const finalColor = vignetted;
+
+    // Dither noise to break up gradient banding (±0.5/255 per channel)
+    const noiseHash = fract(sin(dot(uv(), vec2(127.1, 311.7))).mul(43758.5453));
+    const dither = noiseHash.sub(0.5).mul(1.0 / 255.0);
+    const finalColor = vignetted.add(dither);
 
     const nodeMaterial = new MeshBasicNodeMaterial();
     nodeMaterial.colorNode = finalColor;
