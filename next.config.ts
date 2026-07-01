@@ -14,7 +14,11 @@ export default withMDX({
   output: "export",
   trailingSlash: true,
   pageExtensions: ["ts", "tsx", "md", "mdx"],
-  experimental: { mdxRs: true },
+  staticPageGenerationTimeout: 600,
+  experimental: {
+    mdxRs: true,
+    staticGenerationMaxConcurrency: 1,
+  },
   basePath: normalizedBasePath,
   assetPrefix: normalizedBasePath,
 });
